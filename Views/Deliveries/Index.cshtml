@@ -1,0 +1,44 @@
+@model IEnumerable<WholesaleHub.Models.Delivery>
+@{
+    ViewData["Title"] = "Delivery Management";
+}
+<h3 class="fw-bold mb-3">Delivery Management</h3>
+
+<div class="card border-0 shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Delivery ID</th>
+                <th>Sales Order</th>
+                <th>Customer</th>
+                <th>Tracking #</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model)
+            {
+                <tr>
+                    <td>DEL-#@d.DeliveryID</td>
+                    <td>SO-#@d.SalesOrderID</td>
+                    <td>@d.SalesOrder?.Customer?.CompanyName</td>
+                    <td><code>@d.TrackingNumber</code></td>
+                    <td><span class="badge bg-primary">@d.DeliveryStatus</span></td>
+                    <td>
+                        <form asp-action="UpdateStatus" method="post" class="d-flex gap-2">
+                            <input type="hidden" name="deliveryId" value="@d.DeliveryID" />
+                            <input type="text" name="trackingNumber" value="@d.TrackingNumber" class="form-control form-control-sm" placeholder="Tracking #" />
+                            <select name="deliveryStatus" class="form-select form-select-sm">
+                                <option value="Pending" selected="@(d.DeliveryStatus == "Pending")">Pending</option>
+                                <option value="In Transit" selected="@(d.DeliveryStatus == "In Transit")">In Transit</option>
+                                <option value="Delivered" selected="@(d.DeliveryStatus == "Delivered")">Delivered</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-success">Update</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

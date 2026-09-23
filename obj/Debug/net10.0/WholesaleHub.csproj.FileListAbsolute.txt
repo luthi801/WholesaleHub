@@ -1,0 +1,9 @@
+C:\Users\chama\WholesaleHub\obj\Debug\net10.0\WholesaleHub.csproj.AssemblyReference.cache
+C:\Users\chama\WholesaleHub\obj\Debug\net10.0\rpswa.dswa.cache.json
+C:\Users\chama\WholesaleHub\obj\Debug\net10.0\WholesaleHub.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\chama\WholesaleHub\obj\Debug\net10.0\WholesaleHub.AssemblyInfoInputs.cache
+C:\Users\chama\WholesaleHub\obj\Debug\net10.0\WholesaleHub.AssemblyInfo.cs
+C:\Users\chama\WholesaleHub\obj\Debug\net10.0\WholesaleHub.csproj.CoreCompileInputs.cache
+C:\Users\chama\WholesaleHub\obj\Debug\net10.0\WholesaleHub.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\chama\WholesaleHub\obj\Debug\net10.0\WholesaleHub.RazorAssemblyInfo.cache
+C:\Users\chama\WholesaleHub\obj\Debug\net10.0\WholesaleHub.RazorAssemblyInfo.cs

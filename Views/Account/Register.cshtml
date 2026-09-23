@@ -1,0 +1,48 @@
+@model WholesaleHub.ViewModels.RegisterViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Create your account";
+}
+<section class="login-page" aria-labelledby="register-heading">
+    <div class="login-card">
+        <header class="login-brand">
+            <div class="brand-mark" aria-hidden="true"><i class="bi bi-person-plus"></i></div>
+            <p class="brand-name">WholesaleHub</p>
+            <h1 id="register-heading">Create your account</h1>
+            <p class="brand-subtitle">Join your team workspace and start managing orders with clarity.</p>
+        </header>
+
+        <form asp-controller="Account" asp-action="Register" method="post" class="login-form">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" autocomplete="name" placeholder="Enter your full name" autofocus />
+                <span asp-validation-for="Name" class="field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                <input asp-for="UserName" class="form-control" autocomplete="username" placeholder="Choose a username" />
+                <span asp-validation-for="UserName" class="field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" autocomplete="new-password" placeholder="At least 6 characters" />
+                <span asp-validation-for="Password" class="field-validation-error"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Repeat your password" />
+                <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary login-submit">Create account <i class="bi bi-arrow-right-short" aria-hidden="true"></i></button>
+        </form>
+
+        <p class="auth-switch">Already have an account? <a asp-controller="Account" asp-action="Login">Sign in</a></p>
+        <p class="auth-note"><i class="bi bi-shield-check" aria-hidden="true"></i> New accounts start with Customer access. An administrator can assign additional permissions.</p>
+    </div>
+</section>

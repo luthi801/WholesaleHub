@@ -1,0 +1,46 @@
+@model IEnumerable<WholesaleHub.Models.AccountsReceivable>
+@{
+    ViewData["Title"] = "Accounts Receivable";
+}
+<h3 class="fw-bold mb-3">Accounts Receivable</h3>
+
+<div class="card border-0 shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>AR ID</th>
+                <th>Sales Order</th>
+                <th>Customer</th>
+                <th>Total Billed</th>
+                <th>Paid</th>
+                <th>Outstanding Balance</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model)
+            {
+                <tr>
+                    <td>AR-#@a.AR_ID</td>
+                    <td>SO-#@a.SalesOrderID</td>
+                    <td class="fw-bold">@a.Customer?.CompanyName</td>
+                    <td>PHP @a.TotalAmount.ToString("N2")</td>
+                    <td>PHP @a.AmountPaid.ToString("N2")</td>
+                    <td class="fw-bold text-danger">PHP @a.OutstandingBalance.ToString("N2")</td>
+                    <td>
+                        @if (a.PaymentStatus == "Paid") { <span class="badge bg-success">Paid</span> }
+                        else if (a.PaymentStatus == "Partial") { <span class="badge bg-warning text-dark">Partial</span> }
+                        else { <span class="badge bg-danger">Unpaid</span> }
+                    </td>
+                    <td>
+                        @if (a.OutstandingBalance > 0)
+                        {
+                            <a asp-action="RecordPayment" asp-route-id="@a.AR_ID" class="btn btn-sm btn-outline-success"><i class="bi bi-cash"></i> Record Payment</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

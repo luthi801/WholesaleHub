@@ -1,0 +1,35 @@
+@model IEnumerable<WholesaleHub.Models.AuditLog>
+@{
+    ViewData["Title"] = "Security Logs";
+}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h3 class="fw-bold mb-1">Security Logs</h3>
+        <p class="text-muted mb-0">Authentication and account activity recorded for review.</p>
+    </div>
+    <span class="badge text-bg-light border"><i class="bi bi-shield-check me-1"></i> Protected</span>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Log ID</th>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Security Event</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var l in Model)
+            {
+                <tr>
+                    <td>#@l.LogID</td>
+                    <td>@l.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@l.User?.Name (@l.User?.UserName)</td>
+                    <td>@l.ActionPerformed</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

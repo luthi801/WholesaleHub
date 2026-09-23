@@ -1,0 +1,38 @@
+@model WholesaleHub.ViewModels.LoginViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Sign in";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+<section class="login-page" aria-labelledby="login-heading">
+    <div class="login-card">
+        <header class="login-brand">
+            <div class="brand-mark" aria-hidden="true"><i class="bi bi-box-seam"></i></div>
+            <p class="brand-name">WholesaleHub</p>
+            <h1 id="login-heading">Welcome back</h1>
+            <p class="brand-subtitle">Sign in to manage your wholesale operations.</p>
+        </header>
+
+        <form asp-controller="Account" asp-action="Login" method="post" class="login-form">
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label">Username</label>
+                <input asp-for="UserName" class="form-control" autocomplete="username" placeholder="Enter your username" autofocus />
+                <span asp-validation-for="UserName" class="field-validation-error"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Password" class="form-label">Password</label>
+                <input asp-for="Password" class="form-control" autocomplete="current-password" placeholder="Enter your password" />
+                <span asp-validation-for="Password" class="field-validation-error"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary login-submit">Sign in <i class="bi bi-arrow-right-short" aria-hidden="true"></i></button>
+        </form>
+
+        <p class="auth-switch">Need an account? <a asp-controller="Account" asp-action="Register">Sign up</a></p>
+        <p class="auth-note"><i class="bi bi-shield-check" aria-hidden="true"></i> Secure access for authorized WholesaleHub users.</p>
+    </div>
+</section>

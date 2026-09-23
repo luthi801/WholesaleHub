@@ -1,0 +1,39 @@
+@model IEnumerable<WholesaleHub.Models.Inventory>
+@{
+    ViewData["Title"] = "Warehouse Inventory";
+}
+<h3 class="fw-bold mb-3">Warehouse Inventory</h3>
+
+<div class="card border-0 shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Quantity On Hand</th>
+                <th>Reorder Level</th>
+                <th>Stock Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@i.Product?.ProductName</td>
+                    <td><code>@i.Product?.SKU</code></td>
+                    <td><span class="fs-6 fw-bold">@i.QuantityOnHand</span> @i.Product?.UnitOfMeasure</td>
+                    <td>@i.ReorderLevel</td>
+                    <td>
+                        @if (i.Status == "In Stock") { <span class="badge bg-success">In Stock</span> }
+                        else if (i.Status == "Low Stock") { <span class="badge bg-warning">Low Stock</span> }
+                        else { <span class="badge bg-danger">Out of Stock</span> }
+                    </td>
+                    <td>
+                        <a asp-action="Adjust" asp-route-id="@i.InventoryID" class="btn btn-sm btn-outline-secondary"><i class="bi bi-sliders"></i> Adjust Stock</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

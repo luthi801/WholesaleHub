@@ -1,0 +1,31 @@
+@model WholesaleHub.ViewModels.AdjustStockViewModel
+@{
+    ViewData["Title"] = "Adjust Stock";
+}
+<h3 class="fw-bold mb-3">Adjust Stock - @Model.ProductName</h3>
+<div class="card border-0 shadow-sm p-4 col-md-6">
+    <form asp-action="Adjust" method="post">
+        <input type="hidden" asp-for="InventoryID" />
+        <div class="mb-3">
+            <label class="form-label">Current Stock on Hand</label>
+            <input type="text" class="form-control" value="@Model.QuantityOnHand" disabled />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Reorder Threshold Level</label>
+            <input asp-for="ReorderLevel" type="number" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Adjustment Type</label>
+            <select asp-for="AdjustmentType" class="form-select">
+                <option value="Stock-In">Stock-In (+ Add Stock)</option>
+                <option value="Stock-Out">Stock-Out (- Subtract Stock)</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Quantity</label>
+            <input asp-for="Quantity" type="number" min="1" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Save Adjustment</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

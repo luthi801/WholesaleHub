@@ -1,0 +1,41 @@
+@model IEnumerable<WholesaleHub.Models.Supplier>
+@{
+    ViewData["Title"] = "Supplier Management";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold">Supplier Management</h3>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Supplier</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Company</th>
+                <th>Contact Person</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@s.SupplierName</td>
+                    <td>@s.ContactPerson</td>
+                    <td>@s.Phone</td>
+                    <td>@s.Email</td>
+                    <td>@s.Address</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@s.SupplierID" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                        <form asp-action="Delete" asp-route-id="@s.SupplierID" method="post" class="d-inline" onsubmit="return confirm('Delete supplier?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

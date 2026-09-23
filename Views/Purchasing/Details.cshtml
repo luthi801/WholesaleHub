@@ -1,0 +1,54 @@
+@model WholesaleHub.Models.PurchaseOrder
+@{
+    ViewData["Title"] = "PO Details";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold">PO Details #@Model.PurchaseOrderID</h3>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3">
+            <h5 class="fw-bold">Supplier Info</h5>
+            <p class="mb-1"><strong>Name:</strong> @Model.Supplier?.SupplierName</p>
+            <p class="mb-1"><strong>Contact:</strong> @Model.Supplier?.ContactPerson</p>
+            <p class="mb-1"><strong>Status:</strong> <span class="badge bg-primary">@Model.Status</span></p>
+            <p class="mb-0"><strong>Total Amount:</strong> PHP @Model.TotalAmount.ToString("N2")</p>
+
+            @if (Model.Status != "Received")
+            {
+                <form asp-action="UpdateStatus" method="post" class="mt-3">
+                    <input type="hidden" name="id" value="@Model.PurchaseOrderID" />
+                    <input type="hidden" name="status" value="Received" />
+                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('Receive stock and add to warehouse inventory?');">Mark as Received</button>
+                </form>
+            }
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty Ordered</th>
+                        <th>Unit Cost</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in Model.PurchaseOrderDetails)
+                    {
+                        <tr>
+                            <td>@d.Product?.ProductName</td>
+                            <td>@d.QuantityOrdered</td>
+                            <td>PHP @d.UnitCost.ToString("N2")</td>
+                            <td>PHP @d.Subtotal.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

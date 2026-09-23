@@ -1,0 +1,15 @@
+@model IEnumerable<WholesaleHub.Models.Product>
+@{
+    var isCustomer = User.IsInRole("Customer");
+    ViewData["Title"] = isCustomer ? "Products" : "Product Management";
+}
+<div class="d-flex justify-content-between align-items-center mb-3"><h3 class="fw-bold">@(isCustomer ? "Browse Wholesale Products" : "Product Management")</h3>@if (!isCustomer) { <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Product</a> }</div>
+<div class="card border-0 shadow-sm p-3 mb-3"><form method="get" class="row g-2"><div class="col-md-5"><input type="text" name="search" value="@ViewData["Search"]" class="form-control" placeholder="Search product name, SKU, category..." /></div><div class="col-md-2"><button type="submit" class="btn btn-secondary w-100"><i class="bi bi-search"></i> Search</button></div></form></div>
+@if (isCustomer)
+{
+    <div class="row g-3">@foreach (var product in Model) { var stock = product.Inventory?.QuantityOnHand ?? 0; <div class="col-md-4"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="d-flex justify-content-between"><h5 class="fw-bold">@product.ProductName</h5><span class="badge bg-light text-dark border">@product.SKU</span></div><div class="text-muted small mb-3">@product.Category · @product.UnitOfMeasure</div><div class="fs-5 fw-bold text-success">PHP @product.UnitPrice.ToString("N2")</div><div class="small text-muted mb-3">Available quantity: @stock</div>@if (stock > 0) { <form asp-controller="SalesOrders" asp-action="Create" method="get" class="row g-2"><input type="hidden" name="productId" value="@product.ProductID" /><div class="col-5"><input type="number" name="quantity" value="1" min="1" max="@stock" class="form-control" /></div><div class="col-7"><button type="submit" class="btn btn-primary w-100"><i class="bi bi-cart-plus me-1"></i>Add to Order</button></div></form> } else { <button class="btn btn-secondary w-100" disabled>Out of stock</button> }</div></div></div> }</div>
+}
+else
+{
+    <div class="card border-0 shadow-sm"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>SKU</th><th>Product Name</th><th>Category</th><th>Unit Price</th><th>UOM</th><th>Actions</th></tr></thead><tbody>@foreach (var product in Model) { <tr><td><code>@product.SKU</code></td><td class="fw-bold">@product.ProductName</td><td>@product.Category</td><td>PHP @product.UnitPrice.ToString("N2")</td><td>@product.UnitOfMeasure</td><td><a asp-action="Edit" asp-route-id="@product.ProductID" class="btn btn-sm btn-outline-primary">Edit</a></td></tr> }</tbody></table></div>
+}

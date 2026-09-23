@@ -1,0 +1,48 @@
+@model WholesaleHub.ViewModels.DashboardViewModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Dashboard";
+    var isCustomer = User.IsInRole("Customer");
+}
+@if (isCustomer)
+{
+    <div class="d-flex justify-content-between align-items-center mb-4"><div><div class="text-uppercase small text-primary fw-bold">Customer Dashboard</div><h3 class="fw-bold mb-1">Welcome, @Model.CustomerName</h3><div class="text-muted">Track your orders and shop wholesale products.</div></div><a asp-controller="Products" asp-action="Index" class="btn btn-primary"><i class="bi bi-cart-plus me-2"></i>Shop Now</a></div>
+    <div class="row g-3 mb-4"><div class="col-md-4"><div class="card card-stat bg-white p-3 border-start border-4 border-primary"><div class="text-muted small">Total Orders</div><div class="fs-3 fw-bold">@Model.CustomerTotalOrders</div></div></div><div class="col-md-4"><div class="card card-stat bg-white p-3 border-start border-4 border-warning"><div class="text-muted small">Pending Orders</div><div class="fs-3 fw-bold text-warning">@Model.CustomerPendingOrders</div></div></div><div class="col-md-4"><div class="card card-stat bg-white p-3 border-start border-4 border-success"><div class="text-muted small">Completed Orders</div><div class="fs-3 fw-bold text-success">@Model.CustomerCompletedOrders</div></div></div></div>
+    <div class="card border-0 shadow-sm p-3"><div class="d-flex justify-content-between align-items-center mb-3"><h5 class="fw-bold mb-0">Recent Orders</h5><a asp-controller="SalesOrders" asp-action="Index" class="btn btn-sm btn-outline-primary">View All Orders</a></div><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Order #</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>@if (Model.CustomerRecentOrders.Count == 0) { <tr><td colspan="5" class="text-center text-muted py-4">You have not placed an order yet.</td></tr> } else { @foreach (var order in Model.CustomerRecentOrders) { <tr><td>SO-#@order.SalesOrderID</td><td>@order.OrderDate.ToString("yyyy-MM-dd")</td><td>PHP @order.TotalAmount.ToString("N2")</td><td><span class="badge bg-info text-dark">@order.OrderStatus</span></td><td><a asp-controller="SalesOrders" asp-action="Details" asp-route-id="@order.SalesOrderID" class="btn btn-sm btn-outline-info">Details</a></td></tr> } }</tbody></table></div></div>
+}
+else
+{
+    <h3 class="fw-bold mb-4">Dashboard Overview</h3>
+    <div class="row g-3 mb-4"><div class="col-md-3"><div class="card card-stat bg-white p-3 border-start border-4 border-primary"><div class="text-muted small">Total Products</div><div class="fs-3 fw-bold">@Model.TotalProducts</div></div></div><div class="col-md-3"><div class="card card-stat bg-white p-3 border-start border-4 border-warning"><div class="text-muted small">Low Stock Items</div><div class="fs-3 fw-bold text-warning">@Model.LowStockItems</div></div></div><div class="col-md-3"><div class="card card-stat bg-white p-3 border-start border-4 border-info"><div class="text-muted small">Open Sales Orders</div><div class="fs-3 fw-bold text-info">@Model.OpenSalesOrders</div></div></div><div class="col-md-3"><div class="card card-stat bg-white p-3 border-start border-4 border-danger"><div class="text-muted small">Total AR Balance</div><div class="fs-3 fw-bold text-danger">PHP @Model.TotalARBalance.ToString("N2")</div></div></div></div>
+    <div class="row g-3 mb-4">
+        <div class="col-lg-4"><div class="card border-0 shadow-sm h-100 p-3"><h6 class="fw-bold mb-3">Inventory status</h6><div style="height: 220px"><canvas id="inventoryChart"></canvas></div></div></div>
+        <div class="col-lg-4"><div class="card border-0 shadow-sm h-100 p-3"><h6 class="fw-bold mb-3">Sales trend</h6><div style="height: 220px"><canvas id="salesChart"></canvas></div></div></div>
+        <div class="col-lg-4"><div class="card border-0 shadow-sm h-100 p-3"><h6 class="fw-bold mb-3">Receivables position</h6><div style="height: 220px"><canvas id="receivablesChart"></canvas></div></div></div>
+    </div>
+    <div class="row g-4"><div class="col-md-7"><div class="card border-0 shadow-sm p-3"><h5 class="fw-bold mb-3">Recent Sales Orders</h5><table class="table table-hover align-middle"><thead><tr><th>Order ID</th><th>Customer</th><th>Date</th><th>Total</th><th>Status</th></tr></thead><tbody>@foreach (var order in Model.RecentOrders) { <tr><td>SO-#@order.SalesOrderID</td><td>@order.Customer?.CompanyName</td><td>@order.OrderDate.ToString("yyyy-MM-dd")</td><td>PHP @order.TotalAmount.ToString("N2")</td><td><span class="badge bg-secondary">@order.OrderStatus</span></td></tr> }</tbody></table></div></div><div class="col-md-5"><div class="card border-0 shadow-sm p-3"><h5 class="fw-bold mb-3 text-warning">Low Stock Alerts</h5><ul class="list-group list-group-flush">@foreach (var item in Model.LowStockInventory) { <li class="list-group-item d-flex justify-content-between px-0"><span>@item.Product?.ProductName</span><span class="badge bg-danger">@item.QuantityOnHand</span></li> }</ul></div></div></div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script>
+        const chartFont = { family: "Segoe UI, sans-serif" };
+        const inventoryCanvas = document.getElementById("inventoryChart");
+        if (inventoryCanvas) {
+            new Chart(inventoryCanvas, {
+                type: "doughnut",
+                data: { labels: @Html.Raw(JsonSerializer.Serialize(Model.InventoryStatusCounts.Keys)), datasets: [{ data: @Html.Raw(JsonSerializer.Serialize(Model.InventoryStatusCounts.Values)), backgroundColor: ["#1769d1", "#f59e0b", "#dc3545", "#94a3b8"], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { font: chartFont } } } }
+            });
+            new Chart(document.getElementById("salesChart"), {
+                type: "line",
+                data: { labels: @Html.Raw(JsonSerializer.Serialize(Model.SalesByMonth.Keys)), datasets: [{ label: "Sales", data: @Html.Raw(JsonSerializer.Serialize(Model.SalesByMonth.Values)), borderColor: "#1769d1", backgroundColor: "rgba(23, 105, 209, .12)", fill: true, tension: .3 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+            new Chart(document.getElementById("receivablesChart"), {
+                type: "bar",
+                data: { labels: ["Paid", "Outstanding"], datasets: [{ data: @Html.Raw(JsonSerializer.Serialize(new[] { Model.PaidReceivables, Model.OutstandingReceivables })), backgroundColor: ["#168454", "#f59e0b"], borderRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,61 @@
+@model IEnumerable<WholesaleHub.Models.CustomerCrmInteraction>
+@{
+    ViewData["Title"] = "Customer CRM";
+    var customers = ViewBag.Customers as List<WholesaleHub.Models.Customer>;
+}
+<h3 class="fw-bold mb-3">Customer CRM Logs</h3>
+
+<div class="card border-0 shadow-sm p-3 mb-4">
+    <h5 class="fw-bold mb-3">Log New Interaction</h5>
+    <form asp-action="Create" method="post" class="row g-2">
+        <div class="col-md-3">
+            <select name="CustomerID" class="form-select" required>
+                <option value="">-- Customer --</option>
+                @foreach (var c in customers!)
+                {
+                    <option value="@c.CustomerID">@c.CompanyName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="InteractionType" class="form-select" required>
+                <option value="Phone Call">Phone Call</option>
+                <option value="Site Visit">Site Visit</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Follow-up">Follow-up</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="text" name="Notes" class="form-control" placeholder="Details/Notes..." required />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Log Entry</button>
+        </div>
+    </form>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Logged By</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.InteractionDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td class="fw-bold">@c.Customer?.CompanyName</td>
+                    <td><span class="badge bg-secondary">@c.InteractionType</span></td>
+                    <td>@c.User?.Name</td>
+                    <td>@c.Notes</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

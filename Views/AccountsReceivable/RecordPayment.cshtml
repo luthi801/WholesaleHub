@@ -1,0 +1,30 @@
+@model WholesaleHub.ViewModels.RecordPaymentViewModel
+@{
+    ViewData["Title"] = "Record Customer Payment";
+}
+<h3 class="fw-bold mb-3">Record Customer Payment</h3>
+
+<div class="card border-0 shadow-sm p-4 col-md-6">
+    <p><strong>Customer:</strong> @Model.CustomerName</p>
+    <p><strong>Total Invoice:</strong> PHP @Model.TotalAmount.ToString("N2")</p>
+    <p class="text-danger"><strong>Outstanding Balance:</strong> PHP @Model.OutstandingBalance.ToString("N2")</p>
+
+    <form asp-action="RecordPayment" method="post">
+        <input type="hidden" asp-for="AR_ID" />
+        <div class="mb-3">
+            <label class="form-label">Payment Method</label>
+            <select asp-for="PaymentMethod" class="form-select">
+                <option value="Cash">Cash</option>
+                <option value="GCash">GCash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Amount Paid (PHP)</label>
+            <input asp-for="AmountToPay" type="number" step="0.01" class="form-control" max="@Model.OutstandingBalance" required />
+            <span asp-validation-for="AmountToPay" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-success">Confirm Payment</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

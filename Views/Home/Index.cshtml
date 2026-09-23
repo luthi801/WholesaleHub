@@ -1,0 +1,93 @@
+@{
+    ViewData["Title"] = "Wholesale management made simpler";
+}
+
+<div class="landing-page" id="top">
+    <nav class="navbar navbar-expand-lg landing-nav" aria-label="Main navigation">
+        <div class="container">
+            <a class="navbar-brand landing-brand" asp-controller="Home" asp-action="Index">
+                <span class="landing-logo" aria-hidden="true"><i class="bi bi-box-seam"></i></span>
+                <span>WholesaleHub</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNavigation" aria-controls="landingNavigation" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="landingNavigation">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" href="#top">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item ms-lg-3"><a class="btn btn-outline-primary landing-login" asp-controller="Account" asp-action="Register">Sign up</a></li>
+                    <li class="nav-item"><a class="btn btn-primary landing-login" asp-controller="Account" asp-action="Login">Sign in</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="landing-hero">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6">
+                        <p class="eyebrow"><i class="bi bi-stars"></i> One system for your daily operations</p>
+                        <h1>Run your wholesale business with clarity.</h1>
+                        <p class="hero-copy">WholesaleHub brings purchasing, inventory, sales, deliveries, and receivables together—so your team can make confident decisions from one organized workspace.</p>
+                        <div class="d-flex flex-column flex-sm-row gap-3 hero-actions">
+                            <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register">Create your account <i class="bi bi-arrow-right"></i></a>
+                            <a class="btn btn-outline-primary btn-lg" href="#features">Explore features</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="hero-panel" aria-label="WholesaleHub system overview">
+                            <div class="panel-topline"><span class="status-dot"></span> Operations overview <span class="ms-auto panel-date">Today</span></div>
+                            <div class="panel-metrics">
+                                <div><span>Sales orders</span><strong>24</strong><small class="positive"><i class="bi bi-arrow-up-right"></i> On track</small></div>
+                                <div><span>Stock alerts</span><strong>06</strong><small class="neutral">Needs review</small></div>
+                            </div>
+                            <div class="panel-list">
+                                <div><span class="list-icon blue"><i class="bi bi-receipt"></i></span><span><strong>Sales orders</strong><small>Track orders from creation to fulfilment</small></span><i class="bi bi-check2-circle text-success ms-auto"></i></div>
+                                <div><span class="list-icon amber"><i class="bi bi-box-seam"></i></span><span><strong>Inventory</strong><small>Monitor stock and replenishment levels</small></span><i class="bi bi-check2-circle text-success ms-auto"></i></div>
+                                <div><span class="list-icon teal"><i class="bi bi-truck"></i></span><span><strong>Deliveries</strong><small>Keep fulfilment moving on schedule</small></span><i class="bi bi-check2-circle text-success ms-auto"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="landing-section features-section" id="features">
+            <div class="container">
+                <div class="section-heading text-center">
+                    <p class="eyebrow">Built for wholesale teams</p>
+                    <h2>Everything connected, without the complexity.</h2>
+                    <p>Tools that support the workflow your team already follows, from supplier orders through customer payment.</p>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-4"><article class="feature-card"><span class="feature-icon blue"><i class="bi bi-boxes"></i></span><h3>Inventory control</h3><p>Track on-hand quantities, receive low-stock alerts, and keep your product catalog organized.</p></article></div>
+                    <div class="col-md-6 col-lg-4"><article class="feature-card"><span class="feature-icon teal"><i class="bi bi-cart-plus"></i></span><h3>Purchasing & suppliers</h3><p>Create purchase orders and maintain supplier information in one dependable workflow.</p></article></div>
+                    <div class="col-md-6 col-lg-4"><article class="feature-card"><span class="feature-icon indigo"><i class="bi bi-receipt"></i></span><h3>Sales orders</h3><p>Record customer orders accurately and keep every sale visible from start to finish.</p></article></div>
+                    <div class="col-md-6 col-lg-4"><article class="feature-card"><span class="feature-icon amber"><i class="bi bi-truck"></i></span><h3>Delivery tracking</h3><p>Coordinate fulfilment with clear delivery statuses and tracking details.</p></article></div>
+                    <div class="col-md-6 col-lg-4"><article class="feature-card"><span class="feature-icon rose"><i class="bi bi-cash-stack"></i></span><h3>Accounts receivable</h3><p>Monitor outstanding balances, record payments, and stay ahead of collections.</p></article></div>
+                    <div class="col-md-6 col-lg-4"><article class="feature-card"><span class="feature-icon green"><i class="bi bi-bar-chart-line"></i></span><h3>CRM & reporting</h3><p>Manage customer interactions and turn operational activity into useful insight.</p></article></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="landing-section about-section" id="about">
+            <div class="container">
+                <div class="about-card row align-items-center g-4">
+                    <div class="col-lg-7"><p class="eyebrow">About WholesaleHub</p><h2>A practical command center for growing distributors.</h2><p>WholesaleHub is designed to give wholesale teams a clear, shared view of the work that matters: what is in stock, what is on order, what is being delivered, and what is still owed.</p></div>
+                    <div class="col-lg-5"><div class="about-points"><div><i class="bi bi-check-lg"></i><span>Designed around real operational workflows</span></div><div><i class="bi bi-check-lg"></i><span>Role-based access for every member of your team</span></div><div><i class="bi bi-check-lg"></i><span>Clear information when decisions need to be made</span></div></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="landing-cta">
+            <div class="container text-center"><h2>Ready to bring operations into focus?</h2><p>Create an account or sign in to get back to running your business.</p><a class="btn btn-light btn-lg" asp-controller="Account" asp-action="Register">Create your account <i class="bi bi-arrow-right"></i></a></div>
+        </section>
+    </main>
+
+    <footer class="landing-footer">
+        <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3"><a class="landing-brand footer-brand" asp-controller="Home" asp-action="Index"><span class="landing-logo" aria-hidden="true"><i class="bi bi-box-seam"></i></span><span>WholesaleHub</span></a><div class="footer-links"><a href="#features">Features</a><a href="#about">About</a><a asp-controller="Account" asp-action="Login">Sign in</a><a asp-controller="Account" asp-action="Register">Sign up</a></div><small>© @DateTime.Now.Year WholesaleHub. All rights reserved.</small></div>
+    </footer>
+</div>
