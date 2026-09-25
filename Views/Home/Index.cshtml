@@ -17,7 +17,6 @@
                     <li class="nav-item"><a class="nav-link" href="#top">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
                     <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                    <li class="nav-item ms-lg-3"><a class="btn btn-outline-primary landing-login" asp-controller="Account" asp-action="Register">Sign up</a></li>
                     <li class="nav-item"><a class="btn btn-primary landing-login" asp-controller="Account" asp-action="Login">Sign in</a></li>
                 </ul>
             </div>
@@ -33,7 +32,7 @@
                         <h1>Run your wholesale business with clarity.</h1>
                         <p class="hero-copy">WholesaleHub brings purchasing, inventory, sales, deliveries, and receivables together—so your team can make confident decisions from one organized workspace.</p>
                         <div class="d-flex flex-column flex-sm-row gap-3 hero-actions">
-                            <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register">Create your account <i class="bi bi-arrow-right"></i></a>
+                            <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Login">Sign in <i class="bi bi-arrow-right"></i></a>
                             <a class="btn btn-outline-primary btn-lg" href="#features">Explore features</a>
                         </div>
                     </div>
@@ -83,11 +82,11 @@
         </section>
 
         <section class="landing-cta">
-            <div class="container text-center"><h2>Ready to bring operations into focus?</h2><p>Create an account or sign in to get back to running your business.</p><a class="btn btn-light btn-lg" asp-controller="Account" asp-action="Register">Create your account <i class="bi bi-arrow-right"></i></a></div>
+            <div class="container text-center"><h2>Ready to bring operations into focus?</h2><p>Sign in to get back to running your business.</p><a class="btn btn-light btn-lg" asp-controller="Account" asp-action="Login">Sign in <i class="bi bi-arrow-right"></i></a></div>
         </section>
     </main>
 
     <footer class="landing-footer">
-        <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3"><a class="landing-brand footer-brand" asp-controller="Home" asp-action="Index"><span class="landing-logo" aria-hidden="true"><i class="bi bi-box-seam"></i></span><span>WholesaleHub</span></a><div class="footer-links"><a href="#features">Features</a><a href="#about">About</a><a asp-controller="Account" asp-action="Login">Sign in</a><a asp-controller="Account" asp-action="Register">Sign up</a></div><small>© @DateTime.Now.Year WholesaleHub. All rights reserved.</small></div>
+        <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3"><a class="landing-brand footer-brand" asp-controller="Home" asp-action="Index"><span class="landing-logo" aria-hidden="true"><i class="bi bi-box-seam"></i></span><span>WholesaleHub</span></a><div class="footer-links"><a href="#features">Features</a><a href="#about">About</a><a asp-controller="Account" asp-action="Login">Sign in</a></div><small>© @DateTime.Now.Year WholesaleHub. All rights reserved.</small></div>
     </footer>
 </div>

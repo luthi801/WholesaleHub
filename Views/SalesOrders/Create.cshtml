@@ -18,8 +18,77 @@
 }
 </div><button type="button" id="addItem" class="btn btn-outline-primary mb-3"><i class="bi bi-plus-circle me-1"></i>Add another product</button><div class="border-top pt-3 mb-3 text-end"><strong>Total: <span id="orderTotal">PHP 0.00</span></strong></div><button type="submit" class="btn btn-success"><i class="bi bi-check2-circle me-1"></i>Place Order</button> <a asp-action="Index" class="btn btn-secondary">Cancel</a></form></div>
 @section Scripts {<script>
-let itemIndex=@Math.Max(Model.Items.Count,1); const products=@Html.Raw(System.Text.Json.JsonSerializer.Serialize(products.Select(product=>new { id=product.ProductID,name=product.ProductName,price=product.UnitPrice,stock=product.Inventory?.QuantityOnHand??0 }))); const container=document.getElementById('orderItems'); const total=document.getElementById('orderTotal');
-function updateTotal(){let value=0;document.querySelectorAll('.order-item').forEach(row=>value+=Number(row.querySelector('.price-input').value||0)*Number(row.querySelector('.quantity-input').value||0));total.textContent=`PHP ${value.toFixed(2)}`;}
-function attach(row){row.querySelector('.product-select').addEventListener('change',()=>{const option=row.querySelector('.product-select').selectedOptions[0];const price=Number(option?.dataset.price||0);row.querySelector('.price-display').value=`PHP ${price.toFixed(2)}`;row.querySelector('.price-input').value=price;row.querySelector('.quantity-input').max=option?.dataset.stock||0;updateTotal();});row.querySelector('.quantity-input').addEventListener('input',updateTotal);row.querySelector('.remove-item').addEventListener('click',()=>{row.remove();updateTotal();});}
+let itemIndex=@Math.Max(Model.Items.Count,1); const products=@Html.Raw(System.Text.Json.JsonSerializer.Serialize(products.Select(product=>new { id=product.ProductID,name=product.ProductName,price=product.UnitPrice,stock=product.Inventory?.QuantityOnHand??0 }))); const container=document.getElementById('orderItems'); const total=document.getElementById('orderTotal'); const form=document.querySelector('form');
+function validateRow(row){
+    const select=row.querySelector('.product-select');
+    const quantityInput=row.querySelector('.quantity-input');
+    const option=select.selectedOptions[0];
+    if(!option || option.value === ''){
+        quantityInput.setCustomValidity('');
+        quantityInput.min='1';
+        quantityInput.max='';
+        return true;
+    }
+    const stock=Number(option.dataset.stock || 0);
+    const min=1;
+    const max=Math.max(stock,0);
+    const value=Number(quantityInput.value || 0);
+    quantityInput.min=String(min);
+    quantityInput.max=String(max);
+    if(max === 0){
+        quantityInput.setCustomValidity('This product is currently out of stock.');
+        return false;
+    }
+    if(!Number.isFinite(value) || value < min){
+        quantityInput.setCustomValidity('Minimum quantity is 1.');
+        return false;
+    }
+    if(value > max){
+        quantityInput.setCustomValidity('Quantity cannot exceed the available stock (' + max + ').');
+        return false;
+    }
+    quantityInput.setCustomValidity('');
+    return true;
+}
+function updateTotal(){
+    let value=0;
+    document.querySelectorAll('.order-item').forEach(row => {
+        const price=Number(row.querySelector('.price-input').value || 0);
+        const quantity=Number(row.querySelector('.quantity-input').value || 0);
+        value += price * quantity;
+    });
+    total.textContent=`PHP ${value.toFixed(2)}`;
+}
+function attach(row){
+    const select=row.querySelector('.product-select');
+    const quantityInput=row.querySelector('.quantity-input');
+    select.addEventListener('change',()=>{
+        const option=select.selectedOptions[0];
+        const price=Number(option?.dataset.price || 0);
+        row.querySelector('.price-display').value=`PHP ${price.toFixed(2)}`;
+        row.querySelector('.price-input').value=price;
+        quantityInput.max=String(Number(option?.dataset.stock || 0));
+        if(!validateRow(row)){ quantityInput.reportValidity(); }
+        updateTotal();
+    });
+    quantityInput.addEventListener('input',()=>{
+        if(!validateRow(row)){ quantityInput.reportValidity(); }
+        updateTotal();
+    });
+    quantityInput.addEventListener('change',()=>{
+        if(!validateRow(row)){ quantityInput.reportValidity(); }
+        updateTotal();
+    });
+    row.querySelector('.remove-item').addEventListener('click',()=>{row.remove();updateTotal();});
+    validateRow(row);
+}
+form.addEventListener('submit',(event)=>{
+    const invalidRows=[...document.querySelectorAll('.order-item')].some(row => !validateRow(row));
+    if(invalidRows){
+        event.preventDefault();
+        const firstInvalid=document.querySelector('.quantity-input:invalid, .product-select:invalid');
+        if(firstInvalid){ firstInvalid.reportValidity(); }
+    }
+});
 document.querySelectorAll('.order-item').forEach(attach);document.getElementById('addItem').addEventListener('click',()=>{const row=document.createElement('div');row.className='row g-2 mb-2 order-item';row.innerHTML=`<div class="col-md-6"><select name="Items[${itemIndex}].ProductID" class="form-select product-select" required><option value="">-- Choose Product --</option>${products.map(product=>`<option value="${product.id}" data-price="${product.price}" data-stock="${product.stock}">${product.name} (Available: ${product.stock}) - PHP ${Number(product.price).toFixed(2)}</option>`).join('')}</select></div><div class="col-md-2"><input type="number" name="Items[${itemIndex}].Quantity" value="1" min="1" class="form-control quantity-input" required></div><div class="col-md-3"><input type="text" value="PHP 0.00" class="form-control price-display" readonly><input type="hidden" name="Items[${itemIndex}].UnitPrice" value="0" class="price-input"></div><div class="col-md-1"><button type="button" class="btn btn-outline-danger remove-item"><i class="bi bi-trash"></i></button></div>`;container.appendChild(row);itemIndex++;attach(row);});updateTotal();
 </script>}

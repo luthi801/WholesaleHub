@@ -1,0 +1,63 @@
+@model IEnumerable<WholesaleHub.Models.CustomerPayment>
+@{
+    ViewData["Title"] = "Payment Verification";
+}
+
+<h3 class="fw-bold mb-4">Payment Verification</h3>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Payment</th>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Method</th>
+                    <th>Amount</th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-4">No payment submissions require review.</td></tr>
+                }
+                else
+                {
+                    @foreach (var payment in Model)
+                    {
+                        <tr>
+                            <td>RCPT-@payment.PaymentID</td>
+                            <td>SO-#@payment.SalesOrderID</td>
+                            <td>@(payment.Customer?.CompanyName ?? "Customer")</td>
+                            <td>@payment.PaymentMethod</td>
+                            <td>PHP @payment.AmountPaid.ToString("N2")</td>
+                            <td>@payment.TransactionReference</td>
+                            <td><span class="badge bg-warning text-dark">@payment.PaymentStatus</span></td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a asp-action="Receipt" asp-route-id="@payment.PaymentID" class="btn btn-sm btn-outline-primary">Details</a>
+                                    <form asp-action="Verify" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="paymentId" value="@payment.PaymentID" />
+                                        <input type="hidden" name="decision" value="Approve" />
+                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+                                    <form asp-action="Verify" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="paymentId" value="@payment.PaymentID" />
+                                        <input type="hidden" name="decision" value="Reject" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

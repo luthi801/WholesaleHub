@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using WholesaleHub.Models;
 
 namespace WholesaleHub.Data
@@ -8,6 +9,10 @@ namespace WholesaleHub.Data
         public static void Initialize(ApplicationDbContext context)
         {
             context.Database.EnsureCreated();
+            EnsureUserArchiveColumn(context);
+            EnsurePaymentColumns(context);
+            EnsureProductColumns(context);
+            NormalizeInventoryStatuses(context);
 
             var passwordHasher = new PasswordHasher<User>();
             var existingUsers = context.Users.ToList();
@@ -183,6 +188,167 @@ namespace WholesaleHub.Data
             });
 
             context.SaveChanges();
+        }
+
+        private static void EnsureUserArchiveColumn(ApplicationDbContext context)
+        {
+            var connection = context.Database.GetDbConnection();
+            var openedHere = connection.State != System.Data.ConnectionState.Open;
+            if (openedHere) connection.Open();
+
+            try
+            {
+                using var command = connection.CreateCommand();
+                if (context.Database.IsSqlite())
+                {
+                    command.CommandText = "PRAGMA table_info('Users')";
+                    using var reader = command.ExecuteReader();
+                    var hasColumn = false;
+                    while (reader.Read())
+                    {
+                        if (string.Equals(reader.GetString(1), "IsArchived", StringComparison.OrdinalIgnoreCase))
+                        {
+                            hasColumn = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasColumn)
+                    {
+                        reader.Close();
+                        command.CommandText = "ALTER TABLE Users ADD COLUMN IsArchived INTEGER NOT NULL DEFAULT 0";
+                        command.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    command.CommandText = "IF COL_LENGTH('Users', 'IsArchived') IS NULL ALTER TABLE [Users] ADD [IsArchived] bit NOT NULL CONSTRAINT [DF_Users_IsArchived] DEFAULT 0";
+                    command.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (openedHere) connection.Close();
+            }
+        }
+
+        private static void EnsurePaymentColumns(ApplicationDbContext context)
+        {
+            var connection = context.Database.GetDbConnection();
+            var openedHere = connection.State != System.Data.ConnectionState.Open;
+            if (openedHere) connection.Open();
+
+            try
+            {
+                using var command = connection.CreateCommand();
+
+                if (context.Database.IsSqlite())
+                {
+                    AddSqliteColumnIfMissing(context, connection, "SalesOrders", "PaymentStatus", "TEXT NOT NULL DEFAULT 'Pending Payment'");
+                    AddSqliteColumnIfMissing(context, connection, "CustomerPayments", "SalesOrderID", "INTEGER NULL");
+                    AddSqliteColumnIfMissing(context, connection, "CustomerPayments", "CustomerID", "INTEGER NULL");
+                    AddSqliteColumnIfMissing(context, connection, "CustomerPayments", "TransactionReference", "TEXT NOT NULL DEFAULT ''");
+                    AddSqliteColumnIfMissing(context, connection, "CustomerPayments", "PaymentStatus", "TEXT NOT NULL DEFAULT 'Pending Payment'");
+                    AddSqliteColumnIfMissing(context, connection, "CustomerPayments", "CreatedAt", "TEXT NOT NULL DEFAULT '2000-01-01T00:00:00'");
+                    AddSqliteColumnIfMissing(context, connection, "CustomerPayments", "PaymentProofUrl", "TEXT NULL");
+                    AddSqliteColumnIfMissing(context, connection, "CustomerPayments", "Notes", "TEXT NULL");
+                    AddSqliteColumnIfMissing(context, connection, "CustomerPayments", "ProcessedBy", "TEXT NOT NULL DEFAULT ''");
+                    AddSqliteColumnIfMissing(context, connection, "CustomerPayments", "AR_ID", "INTEGER NOT NULL DEFAULT 0");
+                }
+                else
+                {
+                    AddSqlServerColumnIfMissing(context, connection, "SalesOrders", "PaymentStatus", "NVARCHAR(50) NOT NULL CONSTRAINT DF_SalesOrders_PaymentStatus DEFAULT 'Pending Payment'");
+                    AddSqlServerColumnIfMissing(context, connection, "CustomerPayments", "SalesOrderID", "INT NULL");
+                    AddSqlServerColumnIfMissing(context, connection, "CustomerPayments", "CustomerID", "INT NULL");
+                    AddSqlServerColumnIfMissing(context, connection, "CustomerPayments", "TransactionReference", "NVARCHAR(50) NOT NULL CONSTRAINT DF_CustomerPayments_TransactionReference DEFAULT ''");
+                    AddSqlServerColumnIfMissing(context, connection, "CustomerPayments", "PaymentStatus", "NVARCHAR(30) NOT NULL CONSTRAINT DF_CustomerPayments_PaymentStatus DEFAULT 'Pending Payment'");
+                    AddSqlServerColumnIfMissing(context, connection, "CustomerPayments", "CreatedAt", "DATETIME2 NOT NULL CONSTRAINT DF_CustomerPayments_CreatedAt DEFAULT GETUTCDATE()");
+                    AddSqlServerColumnIfMissing(context, connection, "CustomerPayments", "PaymentProofUrl", "NVARCHAR(255) NULL");
+                    AddSqlServerColumnIfMissing(context, connection, "CustomerPayments", "Notes", "NVARCHAR(500) NULL");
+                    AddSqlServerColumnIfMissing(context, connection, "CustomerPayments", "ProcessedBy", "NVARCHAR(255) NOT NULL CONSTRAINT DF_CustomerPayments_ProcessedBy DEFAULT ''");
+                    AddSqlServerColumnIfMissing(context, connection, "CustomerPayments", "AR_ID", "INT NOT NULL CONSTRAINT DF_CustomerPayments_AR_ID DEFAULT 0");
+                }
+            }
+            finally
+            {
+                if (openedHere) connection.Close();
+            }
+        }
+
+        private static void EnsureProductColumns(ApplicationDbContext context)
+        {
+            var connection = context.Database.GetDbConnection();
+            var openedHere = connection.State != System.Data.ConnectionState.Open;
+            if (openedHere) connection.Open();
+
+            try
+            {
+                if (context.Database.IsSqlite())
+                {
+                    AddSqliteColumnIfMissing(context, connection, "Products", "Brand", "TEXT NOT NULL DEFAULT ''");
+                    AddSqliteColumnIfMissing(context, connection, "Products", "ImageUrl", "TEXT NOT NULL DEFAULT ''");
+                    AddSqliteColumnIfMissing(context, connection, "Products", "Description", "TEXT NOT NULL DEFAULT ''");
+                    AddSqliteColumnIfMissing(context, connection, "Products", "MinimumOrderQuantity", "INTEGER NOT NULL DEFAULT 1");
+                    AddSqliteColumnIfMissing(context, connection, "Products", "IsArchived", "INTEGER NOT NULL DEFAULT 0");
+                    AddSqliteColumnIfMissing(context, connection, "Inventories", "WarehouseLocation", "TEXT NOT NULL DEFAULT ''");
+                }
+                else
+                {
+                    AddSqlServerColumnIfMissing(context, connection, "Products", "Brand", "NVARCHAR(80) NOT NULL CONSTRAINT DF_Products_Brand DEFAULT ''");
+                    AddSqlServerColumnIfMissing(context, connection, "Products", "ImageUrl", "NVARCHAR(120) NOT NULL CONSTRAINT DF_Products_ImageUrl DEFAULT ''");
+                    AddSqlServerColumnIfMissing(context, connection, "Products", "Description", "NVARCHAR(1000) NOT NULL CONSTRAINT DF_Products_Description DEFAULT ''");
+                    AddSqlServerColumnIfMissing(context, connection, "Products", "MinimumOrderQuantity", "INT NOT NULL CONSTRAINT DF_Products_MinimumOrderQuantity DEFAULT 1");
+                    AddSqlServerColumnIfMissing(context, connection, "Products", "IsArchived", "bit NOT NULL CONSTRAINT DF_Products_IsArchived DEFAULT 0");
+                    AddSqlServerColumnIfMissing(context, connection, "Inventories", "WarehouseLocation", "NVARCHAR(100) NOT NULL CONSTRAINT DF_Inventories_WarehouseLocation DEFAULT ''");
+                }
+            }
+            finally
+            {
+                if (openedHere) connection.Close();
+            }
+        }
+
+        private static void NormalizeInventoryStatuses(ApplicationDbContext context)
+        {
+            var inventories = context.Inventories.ToList();
+            foreach (var inventory in inventories)
+            {
+                inventory.Status = inventory.QuantityOnHand <= 0
+                    ? "Out of Stock"
+                    : inventory.QuantityOnHand <= inventory.ReorderLevel ? "Low Stock" : "In Stock";
+            }
+
+            if (inventories.Count > 0) context.SaveChanges();
+        }
+
+        private static void AddSqliteColumnIfMissing(ApplicationDbContext context, System.Data.Common.DbConnection connection, string tableName, string columnName, string columnDefinition)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = $"PRAGMA table_info('{tableName}')";
+            using var reader = command.ExecuteReader();
+            var hasColumn = false;
+            while (reader.Read())
+            {
+                if (string.Equals(reader.GetString(1), columnName, StringComparison.OrdinalIgnoreCase))
+                {
+                    hasColumn = true;
+                    break;
+                }
+            }
+
+            if (!hasColumn)
+            {
+                using var alter = connection.CreateCommand();
+                alter.CommandText = $"ALTER TABLE {tableName} ADD COLUMN {columnName} {columnDefinition}";
+                alter.ExecuteNonQuery();
+            }
+        }
+
+        private static void AddSqlServerColumnIfMissing(ApplicationDbContext context, System.Data.Common.DbConnection connection, string tableName, string columnName, string columnDefinition)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = $"IF COL_LENGTH('{tableName}', '{columnName}') IS NULL ALTER TABLE [dbo].[{tableName}] ADD [{columnName}] {columnDefinition}";
+            command.ExecuteNonQuery();
         }
     }
 }

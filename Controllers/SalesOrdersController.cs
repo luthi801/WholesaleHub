@@ -102,8 +102,9 @@ namespace WholesaleHub.Controllers
                 CustomerID = model.CustomerID,
                 CustomerName = customerRecord.CompanyName,
                 OrderDate = DateTime.UtcNow,
-                OrderStatus = "Pending",
-                Status = "Pending",
+                OrderStatus = "Pending Payment",
+                Status = "Pending Payment",
+                PaymentStatus = "Pending Payment",
                 TotalAmount = items.Sum(item => item.Quantity * item.UnitPrice)
             };
 
@@ -117,6 +118,16 @@ namespace WholesaleHub.Controllers
                     Subtotal = item.Quantity * item.UnitPrice
                 });
                 inventories[item.ProductID].QuantityOnHand -= item.Quantity;
+                inventories[item.ProductID].Status = inventories[item.ProductID].QuantityOnHand <= 0
+                    ? "Out of Stock"
+                    : inventories[item.ProductID].QuantityOnHand <= inventories[item.ProductID].ReorderLevel ? "Low Stock" : "In Stock";
+                _context.InventoryTransactions.Add(new InventoryTransaction
+                {
+                    ProductID = item.ProductID,
+                    UserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
+                    TransactionType = "Stock-Out",
+                    Quantity = item.Quantity
+                });
             }
 
             order.AccountsReceivable = new AccountsReceivable
@@ -159,7 +170,10 @@ namespace WholesaleHub.Controllers
             if (order == null) return NotFound();
             var next = order.OrderStatus switch
             {
-                "Pending" => new[] { "Confirmed", "Cancelled" },
+                "Pending Payment" => new[] { "Payment Submitted", "Cancelled" },
+                "Payment Submitted" => new[] { "Payment Verification", "Cancelled" },
+                "Payment Verification" => new[] { "Paid", "Rejected", "Cancelled" },
+                "Paid" => new[] { "Confirmed", "Cancelled" },
                 "Confirmed" => new[] { "Processing", "Cancelled" },
                 "Processing" => new[] { "Shipped", "Cancelled" },
                 "Shipped" => new[] { "Completed" },
@@ -172,6 +186,15 @@ namespace WholesaleHub.Controllers
             }
             order.OrderStatus = status;
             order.Status = status;
+            order.PaymentStatus = status switch
+            {
+                "Pending Payment" => "Pending Payment",
+                "Payment Submitted" => "Payment Submitted",
+                "Payment Verification" => "Payment Verification",
+                "Paid" => "Paid",
+                "Confirmed" => "Paid",
+                _ => order.PaymentStatus
+            };
             await _context.SaveChangesAsync();
             TempData["Success"] = "Order status updated.";
             return RedirectToAction(nameof(Details), new { id });
@@ -180,7 +203,7 @@ namespace WholesaleHub.Controllers
         private async Task LoadCreateOptions()
         {
             ViewBag.Customers = await _context.Customers.OrderBy(customer => customer.CompanyName).ToListAsync();
-            ViewBag.Products = await _context.Products.Include(product => product.Inventory).OrderBy(product => product.ProductName).ToListAsync();
+            ViewBag.Products = await _context.Products.Where(product => !product.IsArchived).Include(product => product.Inventory).OrderBy(product => product.ProductName).ToListAsync();
         }
 
         private async Task<Customer?> GetCurrentCustomer()

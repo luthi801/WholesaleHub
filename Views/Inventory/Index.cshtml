@@ -4,14 +4,18 @@
 }
 <h3 class="fw-bold mb-3">Warehouse Inventory</h3>
 
-<div class="card border-0 shadow-sm">
-    <table class="table table-hover align-middle mb-0">
+<div class="card border-0 shadow-sm p-3 mb-3"><form method="get" class="row g-2"><div class="col-md-4"><input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search product or SKU" /></div><div class="col-md-2"><select name="category" class="form-select"><option value="">All categories</option>@foreach (var category in (IEnumerable<string>)(ViewBag.Categories ?? new List<string>())) { <option value="@category" selected="@(category == (string?)ViewBag.Category)">@category</option> }</select></div><div class="col-md-2"><select name="stockStatus" class="form-select"><option value="">All statuses</option><option value="In Stock" selected="@(ViewBag.StockStatus == "In Stock")">In Stock</option><option value="Low Stock" selected="@(ViewBag.StockStatus == "Low Stock")">Low Stock</option><option value="Out of Stock" selected="@(ViewBag.StockStatus == "Out of Stock")">Out of Stock</option></select></div><div class="col-md-2"><select name="sort" class="form-select"><option value="">Product A-Z</option><option value="name-desc">Product Z-A</option><option value="stock-asc">Stock low-high</option><option value="stock-desc">Stock high-low</option><option value="status">Status</option></select></div><div class="col-md-2"><button class="btn btn-secondary w-100" type="submit"><i class="bi bi-search"></i> Filter</button></div></form></div>
+<div class="card border-0 shadow-sm"><div class="table-responsive"><table class="table table-hover align-middle mb-0">
         <thead class="table-light">
             <tr>
+                <th>Image</th>
                 <th>Product</th>
                 <th>SKU</th>
+                <th>Category / Brand</th>
+                <th>Unit</th>
                 <th>Quantity On Hand</th>
                 <th>Reorder Level</th>
+                <th>Location</th>
                 <th>Stock Status</th>
                 <th>Actions</th>
             </tr>
@@ -20,10 +24,14 @@
             @foreach (var i in Model)
             {
                 <tr>
+                    <td>@if (!string.IsNullOrWhiteSpace(i.Product?.ImageUrl)) { <img src="@i.Product.ImageUrl" alt="@i.Product.ProductName" style="width: 60px; height: 48px; object-fit: cover; border-radius: 6px;" /> } else { <i class="bi bi-image text-secondary fs-4"></i> }</td>
                     <td class="fw-bold">@i.Product?.ProductName</td>
                     <td><code>@i.Product?.SKU</code></td>
+                    <td>@i.Product?.Category<br /><span class="text-muted small">@i.Product?.Brand</span></td>
+                    <td>@i.Product?.UnitOfMeasure</td>
                     <td><span class="fs-6 fw-bold">@i.QuantityOnHand</span> @i.Product?.UnitOfMeasure</td>
                     <td>@i.ReorderLevel</td>
+                    <td>@(string.IsNullOrWhiteSpace(i.WarehouseLocation) ? "Not assigned" : i.WarehouseLocation)</td>
                     <td>
                         @if (i.Status == "In Stock") { <span class="badge bg-success">In Stock</span> }
                         else if (i.Status == "Low Stock") { <span class="badge bg-warning">Low Stock</span> }
@@ -36,4 +44,4 @@
             }
         </tbody>
     </table>
-</div>
+</table></div></div>

@@ -14,12 +14,14 @@ namespace WholesaleHub.Models
         public Customer? Customer { get; set; }
         public string CustomerName { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
-        public string OrderStatus { get; set; } = string.Empty;
+        public string OrderStatus { get; set; } = "Pending Payment";
+        public string PaymentStatus { get; set; } = "Pending Payment";
         public decimal TotalAmount { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
         public ICollection<SalesOrderDetail> SalesOrderDetails { get; set; } = new List<SalesOrderDetail>();
         public ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
+        public ICollection<CustomerPayment> Payments { get; set; } = new List<CustomerPayment>();
         public AccountsReceivable? AccountsReceivable { get; set; }
     }
 

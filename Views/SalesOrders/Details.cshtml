@@ -21,11 +21,20 @@
             <p class="mb-1"><strong>Status:</strong> @Model.OrderStatus</p>
             <p class="mb-1"><strong>Tracking #:</strong> @Model.Deliveries.FirstOrDefault()?.TrackingNumber</p>
             <p class="mb-0"><strong>AR Status:</strong> @Model.AccountsReceivable?.PaymentStatus</p>
+            @if (User.IsInRole("Customer") && (Model.OrderStatus == "Pending Payment" || Model.OrderStatus == "Payment Verification"))
+            {
+                <div class="mt-3">
+                    <a asp-controller="Payments" asp-action="Checkout" asp-route-id="@Model.SalesOrderID" class="btn btn-success w-100">Proceed to checkout</a>
+                </div>
+            }
             @if (!User.IsInRole("Customer") && Model.OrderStatus != "Completed" && Model.OrderStatus != "Cancelled")
             {
                 var nextStatuses = Model.OrderStatus switch
                 {
-                    "Pending" => new[] { "Confirmed", "Cancelled" },
+                    "Pending Payment" => new[] { "Payment Submitted", "Cancelled" },
+                    "Payment Submitted" => new[] { "Payment Verification", "Cancelled" },
+                    "Payment Verification" => new[] { "Paid", "Rejected", "Cancelled" },
+                    "Paid" => new[] { "Confirmed", "Cancelled" },
                     "Confirmed" => new[] { "Processing", "Cancelled" },
                     "Processing" => new[] { "Shipped", "Cancelled" },
                     "Shipped" => new[] { "Completed" },
@@ -54,7 +63,7 @@
                     @foreach (var d in Model.SalesOrderDetails)
                     {
                         <tr>
-                            <td>@d.Product?.ProductName</td>
+                            <td><div class="d-flex align-items-center gap-2">@if (!string.IsNullOrWhiteSpace(d.Product?.ImageUrl)) { <img src="@d.Product.ImageUrl" alt="@d.Product.ProductName" style="width: 48px; height: 38px; object-fit: cover; border-radius: 6px;" /> } else { <i class="bi bi-image text-secondary"></i> }<span>@d.Product?.ProductName</span></div></td>
                             <td>@d.QuantityOrdered</td>
                             <td>PHP @d.UnitPrice.ToString("N2")</td>
                             <td>PHP @d.Subtotal.ToString("N2")</td>

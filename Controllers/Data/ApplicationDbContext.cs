@@ -54,6 +54,30 @@ namespace WholesaleHub.Data
             modelBuilder.Entity<Customer>()
                 .HasIndex(customer => customer.UserID)
                 .IsUnique();
+
+            modelBuilder.Entity<CustomerPayment>()
+                .HasOne(payment => payment.SalesOrder)
+                .WithMany(order => order.Payments)
+                .HasForeignKey(payment => payment.SalesOrderID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CustomerPayment>()
+                .HasOne(payment => payment.Customer)
+                .WithMany()
+                .HasForeignKey(payment => payment.CustomerID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(payment => payment.SalesOrder)
+                .WithMany()
+                .HasForeignKey(payment => payment.SalesOrderID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(payment => payment.Customer)
+                .WithMany()
+                .HasForeignKey(payment => payment.CustomerID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

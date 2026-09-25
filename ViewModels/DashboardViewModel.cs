@@ -20,5 +20,9 @@ namespace WholesaleHub.ViewModels
         public Dictionary<string, decimal> SalesByMonth { get; set; } = new();
         public decimal PaidReceivables { get; set; }
         public decimal OutstandingReceivables { get; set; }
+        public int PendingPayments { get; set; }
+        public int PaidTransactions { get; set; }
+        public int FailedPayments { get; set; }
+        public decimal TotalPaymentAmount { get; set; }
     }
 }

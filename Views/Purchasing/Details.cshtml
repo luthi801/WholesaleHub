@@ -41,7 +41,7 @@
                     @foreach (var d in Model.PurchaseOrderDetails)
                     {
                         <tr>
-                            <td>@d.Product?.ProductName</td>
+                            <td><div class="d-flex align-items-center gap-2">@if (!string.IsNullOrWhiteSpace(d.Product?.ImageUrl)) { <img src="@d.Product.ImageUrl" alt="@d.Product.ProductName" style="width: 48px; height: 38px; object-fit: cover; border-radius: 6px;" /> } else { <i class="bi bi-image text-secondary"></i> }<span>@d.Product?.ProductName</span></div></td>
                             <td>@d.QuantityOrdered</td>
                             <td>PHP @d.UnitCost.ToString("N2")</td>
                             <td>PHP @d.Subtotal.ToString("N2")</td>

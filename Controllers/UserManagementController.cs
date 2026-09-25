@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Security.Claims;
 using WholesaleHub.Data;
 using WholesaleHub.Models;
 using WholesaleHub.ViewModels;
@@ -20,21 +22,29 @@ namespace WholesaleHub.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string? search, string? role)
+        public async Task<IActionResult> Index(string? search, string? role, bool archived = false)
         {
-            var query = _context.Users
-                .Where(user => ManagedRoles.Contains(user.Role))
-                .AsQueryable();
+                var users = await _context.Users.ToListAsync();
+                var currentUserId = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var parsedUserId)
+                    ? parsedUserId
+                    : 0;
+                var filteredUsers = users
+                    .Where(user => (ManagedRoles.Contains(user.Role) || (user.UserID == currentUserId && user.Role == "Admin")) && user.IsArchived == archived);
 
-            if (!string.IsNullOrWhiteSpace(search))
-                query = query.Where(user => user.Name.Contains(search) || user.UserName.Contains(search));
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    filteredUsers = filteredUsers.Where(user =>
+                        user.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        user.UserName.Contains(search, StringComparison.OrdinalIgnoreCase));
+                }
 
-            if (!string.IsNullOrWhiteSpace(role) && ManagedRoles.Contains(role))
-                query = query.Where(user => user.Role == role);
+                if (!string.IsNullOrWhiteSpace(role) && ManagedRoles.Contains(role))
+                    filteredUsers = filteredUsers.Where(user => user.Role == role);
 
             ViewBag.Search = search;
             ViewBag.Role = role;
-            return View(await query.OrderBy(user => user.Role).ThenBy(user => user.Name).ToListAsync());
+            ViewBag.Archived = archived;
+                return View(filteredUsers.OrderBy(user => user.Role).ThenBy(user => user.Name).ToList());
         }
 
         [HttpGet]
@@ -62,7 +72,9 @@ namespace WholesaleHub.Controllers
 
             if (!ModelState.IsValid) return View(model);
 
-            await using var transaction = await _context.Database.BeginTransactionAsync();
+            IDbContextTransaction? transaction = _context.Database.IsRelational()
+                ? await _context.Database.BeginTransactionAsync()
+                : null;
             var user = new User
             {
                 Name = model.Name.Trim(),
@@ -87,7 +99,8 @@ namespace WholesaleHub.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            await transaction.CommitAsync();
+            if (transaction != null)
+                await transaction.CommitAsync();
             TempData["Success"] = $"{model.Role} account created and is ready to use.";
             return RedirectToAction(nameof(Index));
         }
@@ -95,7 +108,7 @@ namespace WholesaleHub.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(item => item.UserID == id && ManagedRoles.Contains(item.Role));
+            var user = await FindEditableUser(id);
             if (user == null) return NotFound();
 
             var customer = user.Role == "Customer"
@@ -120,8 +133,18 @@ namespace WholesaleHub.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(AdminUserEditViewModel model)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(item => item.UserID == model.UserID && ManagedRoles.Contains(item.Role));
+            var user = await FindEditableUser(model.UserID);
             if (user == null) return NotFound();
+
+            var isOwnAdminProfile = user.Role == "Admin";
+            if (isOwnAdminProfile)
+            {
+                model.Role = "Admin";
+            }
+            else if (model.Role == "Admin")
+            {
+                ModelState.AddModelError(nameof(model.Role), "Only the signed-in administrator can keep an Admin profile.");
+            }
 
             model.UserName = model.UserName.Trim();
             if (await _context.Users.AnyAsync(item => item.UserName == model.UserName && item.UserID != model.UserID))
@@ -158,6 +181,76 @@ namespace WholesaleHub.Controllers
             await _context.SaveChangesAsync();
             TempData["Success"] = "Account updated successfully.";
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<User?> FindEditableUser(int userId)
+        {
+            var currentUserId = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var parsedUserId)
+                ? parsedUserId
+                : 0;
+
+            return await _context.Users.FirstOrDefaultAsync(user =>
+                user.UserID == userId &&
+                (ManagedRoles.Contains(user.Role) || (user.Role == "Admin" && user.UserID == currentUserId)));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Archive(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(item => item.UserID == id && ManagedRoles.Contains(item.Role));
+            if (user == null) return NotFound();
+
+            user.IsArchived = true;
+            await _context.SaveChangesAsync();
+            TempData["Success"] = $"{user.Name}'s account was archived. Their business history has been kept.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(item => item.UserID == id && ManagedRoles.Contains(item.Role));
+            if (user == null) return NotFound();
+
+            user.IsArchived = false;
+            await _context.SaveChangesAsync();
+            TempData["Success"] = $"{user.Name}'s account was restored.";
+            return RedirectToAction(nameof(Index), new { archived = true });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(item => item.UserID == id && ManagedRoles.Contains(item.Role));
+            if (user == null) return NotFound();
+
+            var customer = await _context.Customers.FirstOrDefaultAsync(item => item.UserID == id);
+            var hasUserActivity = await _context.AuditLogs.AnyAsync(item => item.UserID == id)
+                || await _context.InventoryTransactions.AnyAsync(item => item.UserID == id)
+                || await _context.PurchaseOrders.AnyAsync(item => item.UserID == id)
+                || await _context.Deliveries.AnyAsync(item => item.UserID == id)
+                || await _context.CustomerPayments.AnyAsync(item => item.UserID == id)
+                || await _context.CustomerCrmInteractions.AnyAsync(item => item.UserID == id);
+
+            var hasCustomerActivity = customer != null && (
+                await _context.SalesOrders.AnyAsync(item => item.CustomerID == customer.CustomerID)
+                || await _context.AccountsReceivables.AnyAsync(item => item.CustomerID == customer.CustomerID)
+                || await _context.CustomerCrmInteractions.AnyAsync(item => item.CustomerID == customer.CustomerID));
+
+            if (hasUserActivity || hasCustomerActivity)
+            {
+                TempData["Error"] = "This account has business history and cannot be permanently deleted. Archive it to preserve its records.";
+                return RedirectToAction(nameof(Index), new { archived = user.IsArchived });
+            }
+
+            if (customer != null) _context.Customers.Remove(customer);
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = $"{user.Name}'s account was permanently deleted.";
+            return RedirectToAction(nameof(Index), new { archived = user.IsArchived });
         }
     }
 }

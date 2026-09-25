@@ -8,176 +8,177 @@ build_property.ProjectTypeGuids =
 build_property.InvariantGlobalization = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EntryPointFilePath = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = WholesaleHub
 build_property.RootNamespace = WholesaleHub
-build_property.ProjectDir = C:\Users\chama\WholesaleHub\
+build_property.ProjectDir = C:\Users\xboxr\WholesaleHub\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\chama\WholesaleHub
+build_property.MSBuildProjectDirectory = C:\Users\xboxr\WholesaleHub
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/chama/WholesaleHub/Views/AccountsReceivable/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/AccountsReceivable/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudHNSZWNlaXZhYmxlXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/AccountsReceivable/RecordPayment.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/AccountsReceivable/RecordPayment.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudHNSZWNlaXZhYmxlXFJlY29yZFBheW1lbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Account/AccessDenied.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Account/AccessDenied.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxBY2Nlc3NEZW5pZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Account/Login.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Account/Register.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/AuditLogs/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/AuditLogs/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXVkaXRMb2dzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/CRM/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/CRM/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ1JNXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Customers/Create.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Customers/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Customers/Edit.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Customers/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Customers/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Customers/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Customers/MyProfile.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Customers/MyProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXE15UHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Dashboard/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Dashboard/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Deliveries/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Deliveries/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVsaXZlcmllc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Home/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Home/Privacy.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Inventory/Adjust.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Inventory/Adjust.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50b3J5XEFkanVzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Inventory/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Inventory/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50b3J5XEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Products/Create.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Products/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdHNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Products/Edit.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Products/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdHNcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Products/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Products/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdHNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Purchasing/Create.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Purchasing/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHVyY2hhc2luZ1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Purchasing/Details.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Purchasing/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHVyY2hhc2luZ1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Purchasing/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Purchasing/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHVyY2hhc2luZ1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Reports/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Reports/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0c1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/SalesOrders/Create.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/SalesOrders/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FsZXNPcmRlcnNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/SalesOrders/Details.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/SalesOrders/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FsZXNPcmRlcnNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/SalesOrders/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/SalesOrders/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FsZXNPcmRlcnNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/SalesOrders/_CustomerOrderTable.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/SalesOrders/_CustomerOrderTable.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FsZXNPcmRlcnNcX0N1c3RvbWVyT3JkZXJUYWJsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Shared/Error.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Shared/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Shared/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Suppliers/Create.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Suppliers/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwcGxpZXJzXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Suppliers/Edit.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Suppliers/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwcGxpZXJzXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Suppliers/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Suppliers/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwcGxpZXJzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/UserManagement/Create.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/UserManagement/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlck1hbmFnZW1lbnRcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/UserManagement/Edit.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/UserManagement/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlck1hbmFnZW1lbnRcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/UserManagement/Index.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/UserManagement/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlck1hbmFnZW1lbnRcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/_ViewImports.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/_ViewStart.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/chama/WholesaleHub/Views/Shared/_Layout.cshtml]
+[C:/Users/xboxr/WholesaleHub/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-ouryp4oei1

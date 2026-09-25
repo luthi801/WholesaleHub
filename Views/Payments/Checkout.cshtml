@@ -1,0 +1,101 @@
+@model WholesaleHub.Models.SalesOrder
+@{
+    ViewData["Title"] = "Checkout";
+    var subtotal = Model.SalesOrderDetails.Sum(item => item.Subtotal);
+    var discount = 0m;
+    var deliveryFee = 0m;
+    var total = Model.TotalAmount;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <div class="text-uppercase small text-primary fw-bold">Checkout</div>
+        <h3 class="fw-bold mb-0">Complete payment for order SO-#@Model.SalesOrderID</h3>
+    </div>
+    <a asp-controller="SalesOrders" asp-action="Details" asp-route-id="@Model.SalesOrderID" class="btn btn-outline-secondary">Back to order</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm p-3">
+            <h5 class="fw-bold mb-3">Review order</h5>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.SalesOrderDetails)
+                        {
+                            <tr>
+                                <td><div class="d-flex align-items-center gap-2">@if (!string.IsNullOrWhiteSpace(item.Product?.ImageUrl)) { <img src="@item.Product.ImageUrl" alt="@item.Product.ProductName" style="width: 48px; height: 38px; object-fit: cover; border-radius: 6px;" /> } else { <i class="bi bi-image text-secondary"></i> }<span>@item.Product?.ProductName</span></div></td>
+                                <td>@item.QuantityOrdered</td>
+                                <td>PHP @item.UnitPrice.ToString("N2")</td>
+                                <td>PHP @item.Subtotal.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm p-3">
+            <h5 class="fw-bold mb-3">Payment summary</h5>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal</span>
+                <strong>PHP @subtotal.ToString("N2")</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Discount</span>
+                <strong>PHP @discount.ToString("N2")</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Delivery Fee</span>
+                <strong>PHP @deliveryFee.ToString("N2")</strong>
+            </div>
+            <hr />
+            <div class="d-flex justify-content-between mb-3">
+                <span>Total</span>
+                <strong class="fs-5">PHP @total.ToString("N2")</strong>
+            </div>
+
+            <form asp-action="Submit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="OrderId" value="@Model.SalesOrderID" />
+                <input type="hidden" name="CustomerId" value="@Model.CustomerID" />
+                <input type="hidden" name="Amount" value="@total" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Payment method</label>
+                    <select name="PaymentMethod" class="form-select" required>
+                        <option value="GCash">GCash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Credit Card">Credit Card</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Payment proof / reference</label>
+                    <input type="text" name="PaymentProofUrl" class="form-control" placeholder="Optional reference URL or file name" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Notes</label>
+                    <textarea name="Notes" class="form-control" rows="3" placeholder="Optional payment notes or remarks"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="bi bi-shield-check me-2"></i>Submit payment
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

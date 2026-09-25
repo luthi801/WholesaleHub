@@ -12,6 +12,9 @@ namespace WholesaleHub.ViewModels
         [Range(0, 100000)]
         public int ReorderLevel { get; set; }
 
+        [StringLength(100)]
+        public string WarehouseLocation { get; set; } = string.Empty;
+
         [Required]
         public string AdjustmentType { get; set; } = "Stock-In"; // Stock-In, Stock-Out, Set
 

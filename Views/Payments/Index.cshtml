@@ -1,0 +1,75 @@
+@model IEnumerable<WholesaleHub.Models.CustomerPayment>
+@{
+    ViewData["Title"] = "Payments";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold mb-0">Payment History</h3>
+    @if (User.IsInRole("Admin") || User.IsInRole("Accountant"))
+    {
+        <a asp-action="Verification" class="btn btn-primary">Verify payments</a>
+    }
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Receipt</th>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Method</th>
+                    <th>Amount</th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No payments found.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var payment in Model)
+                    {
+                        <tr>
+                            <td>RCPT-@payment.PaymentID</td>
+                            <td>SO-#@payment.SalesOrderID</td>
+                            <td>@(payment.Customer?.CompanyName ?? "Customer")</td>
+                            <td>@payment.PaymentMethod</td>
+                            <td>PHP @payment.AmountPaid.ToString("N2")</td>
+                            <td>@payment.TransactionReference</td>
+                            <td>
+                                @switch (payment.PaymentStatus)
+                                {
+                                    case "Paid":
+                                        <span class="badge bg-success">Paid</span>
+                                        break;
+                                    case "Payment Submitted":
+                                    case "Payment Verification":
+                                        <span class="badge bg-warning text-dark">Pending verification</span>
+                                        break;
+                                    case "Rejected":
+                                    case "Failed":
+                                        <span class="badge bg-danger">@payment.PaymentStatus</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary">@payment.PaymentStatus</span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="Receipt" asp-route-id="@payment.PaymentID" class="btn btn-sm btn-outline-primary">View receipt</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

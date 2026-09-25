@@ -18,6 +18,9 @@ namespace WholesaleHub.Models
         [StringLength(20)]
         public string Status { get; set; } = "In Stock";
 
+        [StringLength(100)]
+        public string WarehouseLocation { get; set; } = string.Empty;
+
         public DateTime LastUpdated { get; set; } = DateTime.Now;
 
         [ForeignKey("ProductID")]

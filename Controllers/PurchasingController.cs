@@ -104,7 +104,17 @@ namespace WholesaleHub.Controllers
                 foreach (var item in order.PurchaseOrderDetails)
                 {
                     if (inventories.TryGetValue(item.ProductID, out var inventory))
+                    {
                         inventory.QuantityOnHand += item.QuantityOrdered;
+                        inventory.Status = inventory.QuantityOnHand <= 0 ? "Out of Stock" : inventory.QuantityOnHand <= inventory.ReorderLevel ? "Low Stock" : "In Stock";
+                        _context.InventoryTransactions.Add(new InventoryTransaction
+                        {
+                            ProductID = item.ProductID,
+                            UserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
+                            TransactionType = "Stock-In",
+                            Quantity = item.QuantityOrdered
+                        });
+                    }
                 }
             }
 
@@ -117,7 +127,7 @@ namespace WholesaleHub.Controllers
         private async Task LoadCreateOptions()
         {
             ViewBag.Suppliers = await _context.Suppliers.OrderBy(supplier => supplier.SupplierName).ToListAsync();
-            ViewBag.Products = await _context.Products.OrderBy(product => product.ProductName).ToListAsync();
+            ViewBag.Products = await _context.Products.Where(product => !product.IsArchived).OrderBy(product => product.ProductName).ToListAsync();
         }
 
         [HttpPost]

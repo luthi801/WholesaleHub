@@ -5,26 +5,35 @@
 <h3 class="fw-bold mb-3">System Reports</h3>
 
 <ul class="nav nav-tabs" id="reportTabs" role="tablist">
-    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#inv">Inventory Report</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#sales">Sales Report</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#purchasing">Purchasing Report</button></li>
+    @if (!User.IsInRole("Accountant"))
+    {
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#inv">Inventory Report</button></li>
+    }
+    <li class="nav-item"><button class="nav-link @(User.IsInRole("Accountant") ? "active" : string.Empty)" data-bs-toggle="tab" data-bs-target="#sales">Sales Report</button></li>
+    @if (!User.IsInRole("Accountant"))
+    {
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#purchasing">Purchasing Report</button></li>
+    }
     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#ar">Financial (AR)</button></li>
 </ul>
 
 <div class="tab-content bg-white p-3 border border-top-0 rounded-bottom">
-    <div class="tab-pane fade show active" id="inv">
-        <h5 class="fw-bold my-2">Inventory Stock Snapshot</h5>
-        <table class="table table-striped">
-            <thead><tr><th>Product</th><th>On Hand</th><th>Reorder Level</th><th>Status</th></tr></thead>
-            <tbody>
-                @foreach (var i in Model.InventoryList)
-                {
-                    <tr><td>@i.Product?.ProductName</td><td>@i.QuantityOnHand</td><td>@i.ReorderLevel</td><td>@i.Status</td></tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    <div class="tab-pane fade" id="sales">
+    @if (!User.IsInRole("Accountant"))
+    {
+        <div class="tab-pane fade show active" id="inv">
+            <h5 class="fw-bold my-2">Inventory Stock Snapshot</h5>
+            <table class="table table-striped">
+                <thead><tr><th>Product</th><th>On Hand</th><th>Reorder Level</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var i in Model.InventoryList)
+                    {
+                        <tr><td>@i.Product?.ProductName</td><td>@i.QuantityOnHand</td><td>@i.ReorderLevel</td><td>@i.Status</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    <div class="tab-pane fade @(User.IsInRole("Accountant") ? "show active" : string.Empty)" id="sales">
         <h5 class="fw-bold my-2">Sales Orders Summary</h5>
         <table class="table table-striped">
             <thead><tr><th>SO ID</th><th>Customer</th><th>Date</th><th>Amount</th></tr></thead>
@@ -36,18 +45,21 @@
             </tbody>
         </table>
     </div>
-    <div class="tab-pane fade" id="purchasing">
-        <h5 class="fw-bold my-2">Purchase Orders Summary</h5>
-        <table class="table table-striped">
-            <thead><tr><th>PO ID</th><th>Supplier</th><th>Date</th><th>Status</th></tr></thead>
-            <tbody>
-                @foreach (var p in Model.PurchaseList)
-                {
-                    <tr><td>PO-#@p.PurchaseOrderID</td><td>@p.Supplier?.SupplierName</td><td>@p.OrderDate.ToShortDateString()</td><td>@p.Status</td></tr>
-                }
-            </tbody>
-        </table>
-    </div>
+    @if (!User.IsInRole("Accountant"))
+    {
+        <div class="tab-pane fade" id="purchasing">
+            <h5 class="fw-bold my-2">Purchase Orders Summary</h5>
+            <table class="table table-striped">
+                <thead><tr><th>PO ID</th><th>Supplier</th><th>Date</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var p in Model.PurchaseList)
+                    {
+                        <tr><td>PO-#@p.PurchaseOrderID</td><td>@p.Supplier?.SupplierName</td><td>@p.OrderDate.ToShortDateString()</td><td>@p.Status</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
     <div class="tab-pane fade" id="ar">
         <h5 class="fw-bold my-2">Financial Receivables</h5>
         <table class="table table-striped">

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using WholesaleHub.Data;
 using WholesaleHub.Models;
+using WholesaleHub.Security;
 using WholesaleHub.ViewModels;
 
 namespace WholesaleHub.Controllers
@@ -52,7 +53,7 @@ namespace WholesaleHub.Controllers
                 passwordValid = true;
             }
 
-            if (user == null || !passwordValid)
+            if (user == null || !passwordValid || user.IsArchived)
             {
                 ModelState.AddModelError("", "Invalid login credentials.");
                 ViewData["ReturnUrl"] = returnUrl;
@@ -73,54 +74,15 @@ namespace WholesaleHub.Controllers
         [AllowAnonymous]
         public IActionResult Register()
         {
-            if (User.Identity?.IsAuthenticated == true)
-                return RedirectForRole(User.FindFirstValue(ClaimTypes.Role));
-
-            return View();
+            return RedirectToAction(nameof(Login));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public IActionResult Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var userName = model.UserName.Trim();
-            if (await _context.Users.AnyAsync(u => u.UserName == userName))
-            {
-                ModelState.AddModelError(nameof(model.UserName), "That username is already in use.");
-                return View(model);
-            }
-
-            var user = new User
-            {
-                Name = model.Name.Trim(),
-                UserName = userName,
-                Role = "Customer"
-            };
-            user.Password = _passwordHasher.HashPassword(user, model.Password);
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            _context.Customers.Add(new Customer
-            {
-                UserID = user.UserID,
-                CompanyName = model.Name.Trim(),
-                ContactPerson = model.Name.Trim(),
-                Email = $"{userName}@customer.local",
-                Phone = "Not provided",
-                Address = "Not provided"
-            });
-            await _context.SaveChangesAsync();
-            await SignInUser(user);
-
-            _context.AuditLogs.Add(new AuditLog { UserID = user.UserID, ActionPerformed = $"New customer registered: {user.UserName}" });
-            await _context.SaveChangesAsync();
-
-            return RedirectForRole(user.Role);
+            return RedirectToAction(nameof(Login));
         }
 
         [HttpPost]
@@ -135,7 +97,7 @@ namespace WholesaleHub.Controllers
             }
 
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login");
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult AccessDenied()
@@ -150,7 +112,8 @@ namespace WholesaleHub.Controllers
                 new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Role, user.Role),
-                new Claim("UserName", user.UserName)
+                new Claim("UserName", user.UserName),
+                new Claim(ApplicationSession.ClaimType, ApplicationSession.Id)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -162,7 +125,7 @@ namespace WholesaleHub.Controllers
             return role switch
             {
                 "Warehouse" => RedirectToAction("Index", "Inventory"),
-                "Accountant" => RedirectToAction("Index", "AccountsReceivable"),
+                "Accountant" => RedirectToAction("Index", "Dashboard"),
                 "Customer" => RedirectToAction("Index", "Dashboard"),
                 _ => RedirectToAction("Index", "Dashboard")
             };

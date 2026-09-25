@@ -15,6 +15,10 @@
             <input asp-for="ReorderLevel" type="number" class="form-control" />
         </div>
         <div class="mb-3">
+            <label class="form-label">Warehouse Location</label>
+            <input asp-for="WarehouseLocation" class="form-control" placeholder="Aisle 1 / Rack B" />
+        </div>
+        <div class="mb-3">
             <label class="form-label">Adjustment Type</label>
             <select asp-for="AdjustmentType" class="form-select">
                 <option value="Stock-In">Stock-In (+ Add Stock)</option>

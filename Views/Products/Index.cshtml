@@ -1,15 +1,36 @@
 @model IEnumerable<WholesaleHub.Models.Product>
 @{
     var isCustomer = User.IsInRole("Customer");
+    var isAdmin = User.IsInRole("Admin");
+    var showArchived = (bool)(ViewData["Archived"] ?? false);
     ViewData["Title"] = isCustomer ? "Products" : "Product Management";
 }
-<div class="d-flex justify-content-between align-items-center mb-3"><h3 class="fw-bold">@(isCustomer ? "Browse Wholesale Products" : "Product Management")</h3>@if (!isCustomer) { <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Product</a> }</div>
-<div class="card border-0 shadow-sm p-3 mb-3"><form method="get" class="row g-2"><div class="col-md-5"><input type="text" name="search" value="@ViewData["Search"]" class="form-control" placeholder="Search product name, SKU, category..." /></div><div class="col-md-2"><button type="submit" class="btn btn-secondary w-100"><i class="bi bi-search"></i> Search</button></div></form></div>
+<div class="d-flex justify-content-between align-items-center mb-3"><h3 class="fw-bold">@(isCustomer ? "Browse Wholesale Products" : showArchived ? "Archived Products" : "Product Management")</h3>@if (!isCustomer) { <div class="d-flex gap-2">@if (isAdmin) { <a asp-action="Index" asp-route-archived="@(!showArchived)" class="btn btn-outline-primary"><i class="bi bi-archive me-1"></i>@(showArchived ? "Active Products" : "Archived Products")</a> } @if (!showArchived) { <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Product</a> }</div> }</div>
+<div class="card border-0 shadow-sm p-3 mb-3"><form method="get" class="row g-2"><input type="hidden" name="archived" value="@showArchived.ToString().ToLowerInvariant()" /><div class="col-md-4"><input type="text" name="search" value="@ViewData["Search"]" class="form-control" placeholder="Search name, SKU, brand..." /></div><div class="col-md-2"><select name="category" class="form-select"><option value="">All categories</option>@foreach (var category in (IEnumerable<string>)(ViewBag.Categories ?? new List<string>())) { <option value="@category" selected="@(category == (string?)ViewData["Category"])">@category</option> }</select></div><div class="col-md-2"><select name="stockStatus" class="form-select"><option value="">All stock status</option><option value="In Stock" selected="@(ViewData["StockStatus"] as string == "In Stock")">In Stock</option><option value="Low Stock" selected="@(ViewData["StockStatus"] as string == "Low Stock")">Low Stock</option><option value="Out of Stock" selected="@(ViewData["StockStatus"] as string == "Out of Stock")">Out of Stock</option></select></div><div class="col-md-2"><select name="sort" class="form-select"><option value="">Name A-Z</option><option value="name-desc">Name Z-A</option><option value="stock-asc">Stock low-high</option><option value="stock-desc">Stock high-low</option><option value="category">Category</option></select></div><div class="col-md-2"><button type="submit" class="btn btn-secondary w-100"><i class="bi bi-search"></i> Filter</button></div></form></div>
 @if (isCustomer)
 {
-    <div class="row g-3">@foreach (var product in Model) { var stock = product.Inventory?.QuantityOnHand ?? 0; <div class="col-md-4"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="d-flex justify-content-between"><h5 class="fw-bold">@product.ProductName</h5><span class="badge bg-light text-dark border">@product.SKU</span></div><div class="text-muted small mb-3">@product.Category · @product.UnitOfMeasure</div><div class="fs-5 fw-bold text-success">PHP @product.UnitPrice.ToString("N2")</div><div class="small text-muted mb-3">Available quantity: @stock</div>@if (stock > 0) { <form asp-controller="SalesOrders" asp-action="Create" method="get" class="row g-2"><input type="hidden" name="productId" value="@product.ProductID" /><div class="col-5"><input type="number" name="quantity" value="1" min="1" max="@stock" class="form-control" /></div><div class="col-7"><button type="submit" class="btn btn-primary w-100"><i class="bi bi-cart-plus me-1"></i>Add to Order</button></div></form> } else { <button class="btn btn-secondary w-100" disabled>Out of stock</button> }</div></div></div> }</div>
+    @await Html.PartialAsync("_CustomerCatalog", Model)
 }
 else
 {
-    <div class="card border-0 shadow-sm"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>SKU</th><th>Product Name</th><th>Category</th><th>Unit Price</th><th>UOM</th><th>Actions</th></tr></thead><tbody>@foreach (var product in Model) { <tr><td><code>@product.SKU</code></td><td class="fw-bold">@product.ProductName</td><td>@product.Category</td><td>PHP @product.UnitPrice.ToString("N2")</td><td>@product.UnitOfMeasure</td><td><a asp-action="Edit" asp-route-id="@product.ProductID" class="btn btn-sm btn-outline-primary">Edit</a></td></tr> }</tbody></table></div>
+    <div class="card border-0 shadow-sm"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Image</th><th>Product</th><th>SKU</th><th>Category</th><th>Brand</th><th>Unit / Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody>@foreach (var product in Model) { var inventory = product.Inventory; <tr><td>@if (!string.IsNullOrWhiteSpace(product.ImageUrl)) { <img src="@product.ImageUrl" alt="@product.ProductName" style="width: 52px; height: 42px; object-fit: cover; border-radius: 6px;" /> } else { <i class="bi bi-image text-secondary fs-4"></i> }</td><td class="fw-bold">@product.ProductName</td><td><code>@product.SKU</code></td><td>@product.Category</td><td>@product.Brand</td><td>@product.UnitOfMeasure<br />PHP @product.UnitPrice.ToString("N2")</td><td><span class="badge @(inventory?.Status == "In Stock" ? "bg-success" : inventory?.Status == "Low Stock" ? "bg-warning text-dark" : "bg-danger")">@(inventory?.Status ?? "Out of Stock")</span><br />@(inventory?.QuantityOnHand ?? 0)</td><td class="d-flex flex-wrap gap-2"><a asp-action="Edit" asp-route-id="@product.ProductID" class="btn btn-sm btn-outline-primary">Edit</a>@if (isAdmin) { <form asp-action="Archive" asp-route-id="@product.ProductID" asp-route-archived="@(!showArchived)" method="post"><button class="btn btn-sm btn-outline-warning" type="submit"><i class="bi bi-archive me-1"></i>@(showArchived ? "Restore" : "Archive")</button></form>@if (!showArchived) { <form asp-action="Delete" asp-route-id="@product.ProductID" method="post" onsubmit="return confirm('Permanently delete this product? Products with history should be archived instead.');"><button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-trash me-1"></i>Delete</button></form> } }</td></tr> }</tbody></table></div></div>
 }
+
+<style>
+    .product-catalog-image {
+        align-items: center;
+        background: #f4f7fb;
+        border-bottom: 1px solid rgba(148, 163, 184, .2);
+        color: #64748b;
+        display: flex;
+        height: 210px;
+        justify-content: center;
+        padding: 14px;
+    }
+
+    .product-catalog-image img {
+        height: 100%;
+        object-fit: contain;
+        width: 100%;
+    }
+</style>

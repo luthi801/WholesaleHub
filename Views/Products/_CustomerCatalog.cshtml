@@ -1,0 +1,164 @@
+@using System.Text.Json
+@model IEnumerable<WholesaleHub.Models.Product>
+@{
+    var products = Model.Select(product => new
+    {
+        id = product.ProductID,
+        name = product.ProductName,
+        sku = product.SKU,
+        category = product.Category,
+        brand = product.Brand,
+        price = product.UnitPrice,
+        unit = product.UnitOfMeasure,
+        stock = product.Inventory?.QuantityOnHand ?? 0,
+        min = Math.Max(1, product.MinimumOrderQuantity),
+        description = product.Description,
+        image = product.ImageUrl
+    }).ToList();
+}
+
+<div class="catalog-cart-bar d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+    <div><span class="text-muted small text-uppercase fw-bold">Wholesale catalog</span><div class="fw-bold">Select products and build your order</div></div>
+    <div class="d-flex align-items-center gap-3"><span class="catalog-cart-count"><i class="bi bi-cart3 me-2"></i><span id="catalogCartCount">0</span> items</span><form asp-controller="SalesOrders" asp-action="Create" method="post" id="catalogOrderForm" class="m-0">@Html.AntiForgeryToken()<button type="submit" id="reviewOrderButton" class="btn btn-primary" disabled><i class="bi bi-arrow-right-circle me-1"></i>Review order</button></form></div>
+</div>
+
+<div class="row g-3">
+    @foreach (var product in Model)
+    {
+        var stock = product.Inventory?.QuantityOnHand ?? 0;
+        <div class="col-md-4">
+            <article class="card border-0 shadow-sm h-100 customer-product-card">
+                <button type="button" class="customer-product-image" data-details-id="@product.ProductID" aria-label="View @product.ProductName">
+                    @if (!string.IsNullOrWhiteSpace(product.ImageUrl)) { <img src="@product.ImageUrl" alt="@product.ProductName" /> } else { <i class="bi bi-image fs-1"></i> }
+                </button>
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between gap-2 align-items-start"><button type="button" class="customer-product-name" data-details-id="@product.ProductID">@product.ProductName</button><span class="badge bg-light text-dark border">@product.SKU</span></div>
+                    <div class="text-muted small mb-2">@product.Brand · @product.Category · @product.UnitOfMeasure</div>
+                    <div class="small text-muted mb-3">MOQ: @Math.Max(1, product.MinimumOrderQuantity) · Available: @stock</div>
+                    <div class="fs-5 fw-bold text-success mb-3">PHP @product.UnitPrice.ToString("N2") / @product.UnitOfMeasure</div>
+                    <div class="mt-auto d-flex gap-2">
+                        <button type="button" class="btn btn-outline-primary flex-grow-1 customer-view-item" data-details-id="@product.ProductID"><i class="bi bi-eye me-1"></i>View Item</button>
+                        <button type="button" class="btn btn-primary flex-grow-1" data-quick-id="@product.ProductID" @(stock < Math.Max(1, product.MinimumOrderQuantity) ? "disabled" : null)><i class="bi bi-cart-plus me-1"></i>Add to Order</button>
+                    </div>
+                </div>
+            </article>
+        </div>
+    }
+</div>
+
+<div class="catalog-modal-backdrop" id="catalogModalBackdrop" hidden>
+    <section class="catalog-modal" role="dialog" aria-modal="true" aria-labelledby="catalogModalTitle">
+        <button type="button" class="catalog-modal-close" id="catalogModalClose" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+        <div class="catalog-modal-grid">
+            <div class="catalog-modal-image" id="catalogModalImage"></div>
+            <div class="catalog-modal-content">
+                <span class="text-uppercase small text-primary fw-bold" id="catalogModalEyebrow">Product details</span>
+                <h3 class="fw-bold mt-2 mb-1" id="catalogModalTitle"></h3>
+                <div class="text-muted small mb-3" id="catalogModalMeta"></div>
+                <p class="text-muted" id="catalogModalDescription"></p>
+                <div class="catalog-detail-grid mb-3"><div><span>Wholesale price</span><strong id="catalogModalPrice"></strong></div><div><span>Unit</span><strong id="catalogModalUnit"></strong></div><div><span>Available</span><strong id="catalogModalStock"></strong></div><div><span>Minimum order</span><strong id="catalogModalMin"></strong></div></div>
+                <div class="d-flex align-items-end gap-3"><div class="flex-grow-1"><label for="catalogModalQuantity" class="form-label fw-bold">Quantity</label><div class="catalog-quantity"><button type="button" id="catalogModalMinus" aria-label="Decrease quantity"><i class="bi bi-dash"></i></button><input id="catalogModalQuantity" type="number" min="1" value="1" /><button type="button" id="catalogModalPlus" aria-label="Increase quantity"><i class="bi bi-plus"></i></button></div><div class="small text-danger mt-2" id="catalogModalValidation"></div></div><div class="text-end"><div class="small text-muted">Subtotal</div><strong class="fs-5" id="catalogModalSubtotal">PHP 0.00</strong></div></div>
+                <button type="button" class="btn btn-primary w-100 mt-4" id="catalogModalAdd"><i class="bi bi-cart-plus me-1"></i>Add to Cart / Order</button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    .catalog-cart-bar { background: rgba(29, 67, 105, .7); border: 1px solid rgba(174, 207, 255, .16); border-radius: 12px; color: #f8fafc; padding: 1rem 1.2rem; }
+    .catalog-cart-count { color: #c7dcf8; font-weight: 600; }
+    body.catalog-modal-open { overflow: hidden; }
+    .customer-product-card { background: #102a47; color: #f8fafc; overflow: hidden; }
+    .customer-product-image { align-items: center; background: linear-gradient(145deg, rgba(64, 132, 196, .22), rgba(15, 42, 72, .82)); border: 0; border-bottom: 1px solid rgba(147, 197, 253, .22); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1); color: #a9c7e8; display: flex; height: 210px; justify-content: center; padding: 14px; width: 100%; }
+    .customer-product-image img { height: 100%; object-fit: contain; width: 100%; }
+    .customer-product-name { background: transparent; border: 0; color: #f8fafc; font-size: 1.15rem; font-weight: 700; padding: 0; text-align: left; }
+    .customer-product-name:hover { color: #75c8ff; }
+    .customer-view-item { background: rgba(75, 144, 232, .08); border-color: rgba(147, 197, 253, .46); color: #b8daf7; }
+    .customer-view-item:hover { background: rgba(75, 144, 232, .24); border-color: #75c8ff; color: #fff; }
+    .catalog-modal-backdrop { align-items: center; background: rgba(3, 13, 27, .76); backdrop-filter: blur(7px); display: flex; inset: 0; justify-content: center; padding: 1rem; position: fixed; z-index: 1050; }
+    .catalog-modal-backdrop[hidden] { display: none; }
+    .catalog-modal { animation: catalogModalIn .2s ease-out; background: linear-gradient(145deg, rgba(18, 48, 79, .97), rgba(8, 27, 50, .97)); border: 1px solid rgba(147, 197, 253, .3); border-radius: 18px; box-shadow: 0 24px 80px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .12); color: #f8fafc; max-height: min(720px, calc(100vh - 2rem)); max-width: 900px; overflow: auto; padding: 1.5rem; position: relative; width: 100%; }
+    .catalog-modal-close { align-items: center; background: rgba(147, 197, 253, .14); border: 1px solid rgba(147, 197, 253, .2); border-radius: 50%; color: #dbeafe; display: flex; height: 36px; justify-content: center; position: absolute; right: 1rem; top: 1rem; width: 36px; z-index: 1; }
+    .catalog-modal-grid { display: grid; gap: 2rem; grid-template-columns: minmax(260px, 1fr) minmax(300px, 1fr); }
+    .catalog-modal-image { align-items: center; background: rgba(147, 197, 253, .08); border: 1px solid rgba(147, 197, 253, .22); border-radius: 12px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); display: flex; min-height: 360px; justify-content: center; overflow: hidden; padding: 1.5rem; }
+    .catalog-modal-image img { height: 100%; max-height: 430px; object-fit: contain; width: 100%; }
+    .catalog-detail-grid { display: grid; gap: .75rem; grid-template-columns: 1fr 1fr; }
+    .catalog-detail-grid div { background: rgba(147, 197, 253, .1); border: 1px solid rgba(147, 197, 253, .13); border-radius: 8px; padding: .65rem .75rem; }
+    .catalog-detail-grid span { color: #a9c7e8; display: block; font-size: .75rem; }
+    .catalog-detail-grid strong { display: block; margin-top: .2rem; }
+    .catalog-quantity { align-items: center; background: rgba(8, 27, 50, .72); border: 1px solid rgba(147, 197, 253, .28); border-radius: 8px; display: flex; max-width: 180px; overflow: hidden; }
+    .catalog-quantity button { background: rgba(75, 144, 232, .2); border: 0; color: #dbeafe; height: 40px; width: 42px; }
+    .catalog-quantity input { background: transparent; border: 0; color: #f8fafc; height: 40px; min-width: 0; text-align: center; width: 95px; }
+    @@keyframes catalogModalIn { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @@media (max-width: 700px) { .catalog-modal-grid { grid-template-columns: 1fr; gap: 1rem; } .catalog-modal-image { min-height: 220px; } .catalog-modal { padding: 1rem; } }
+</style>
+
+<script>
+(() => {
+    const products = @Html.Raw(JsonSerializer.Serialize(products));
+    const cart = [];
+    const backdrop = document.getElementById('catalogModalBackdrop');
+    const modal = backdrop.querySelector('.catalog-modal');
+    const quantity = document.getElementById('catalogModalQuantity');
+    const validation = document.getElementById('catalogModalValidation');
+    let activeProduct = null;
+
+    function findProduct(id) { return products.find(product => product.id === Number(id)); }
+    function formatMoney(value) { return `PHP ${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`; }
+    function setQuantity(value) {
+        if (!activeProduct) return;
+        const min = activeProduct.min;
+        const max = activeProduct.stock;
+        quantity.value = Math.min(Math.max(Number(value) || min, min), Math.max(min, max));
+        document.getElementById('catalogModalSubtotal').textContent = formatMoney(activeProduct.price * Number(quantity.value));
+        validation.textContent = max < min ? 'This product is below its minimum order quantity.' : Number(quantity.value) > max ? `Only ${max} units are available.` : '';
+        document.getElementById('catalogModalAdd').disabled = max < min || Number(quantity.value) > max;
+    }
+    function openModal(id) {
+        activeProduct = findProduct(id);
+        if (!activeProduct) return;
+        document.getElementById('catalogModalTitle').textContent = activeProduct.name;
+        document.getElementById('catalogModalMeta').textContent = `${activeProduct.brand || 'Wholesale product'} · ${activeProduct.category} · SKU ${activeProduct.sku}`;
+        document.getElementById('catalogModalDescription').textContent = activeProduct.description || 'Wholesale product available for customer ordering.';
+        document.getElementById('catalogModalPrice').textContent = formatMoney(activeProduct.price);
+        document.getElementById('catalogModalUnit').textContent = activeProduct.unit || 'Unit';
+        document.getElementById('catalogModalStock').textContent = activeProduct.stock;
+        document.getElementById('catalogModalMin').textContent = activeProduct.min;
+        document.getElementById('catalogModalImage').innerHTML = activeProduct.image ? `<img src="${activeProduct.image}" alt="${activeProduct.name}">` : '<i class="bi bi-image fs-1 text-secondary"></i>';
+        setQuantity(activeProduct.min);
+        backdrop.hidden = false;
+        document.body.classList.add('catalog-modal-open');
+        modal.focus();
+    }
+    function closeModal() { backdrop.hidden = true; document.body.classList.remove('catalog-modal-open'); activeProduct = null; }
+    function addToCart() {
+        if (!activeProduct) return;
+        const requested = Number(quantity.value);
+        const existing = cart.find(item => item.id === activeProduct.id);
+        const total = (existing?.quantity || 0) + requested;
+        if (requested < activeProduct.min || total > activeProduct.stock) { validation.textContent = total > activeProduct.stock ? `Only ${activeProduct.stock} units are available.` : `Minimum order is ${activeProduct.min} units.`; return; }
+        if (existing) existing.quantity = total; else cart.push({ id: activeProduct.id, quantity: requested, price: activeProduct.price });
+        renderCart();
+        closeModal();
+    }
+    function renderCart() {
+        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('catalogCartCount').textContent = count;
+        const form = document.getElementById('catalogOrderForm');
+        form.querySelectorAll('.catalog-cart-input').forEach(input => input.remove());
+        cart.forEach((item, index) => { [['ProductID', item.id], ['Quantity', item.quantity], ['UnitPrice', item.price]].forEach(([name, value]) => { const input = document.createElement('input'); input.type = 'hidden'; input.name = `Items[${index}].${name}`; input.value = value; input.className = 'catalog-cart-input'; form.appendChild(input); }); });
+        document.getElementById('reviewOrderButton').disabled = cart.length === 0;
+    }
+    document.querySelectorAll('[data-quick-id]').forEach(button => button.addEventListener('click', () => openModal(button.dataset.quickId)));
+    document.querySelectorAll('[data-details-id]').forEach(button => button.addEventListener('click', () => openModal(button.dataset.detailsId)));
+    document.getElementById('catalogModalClose').addEventListener('click', closeModal);
+    document.getElementById('catalogModalAdd').addEventListener('click', addToCart);
+    document.getElementById('catalogModalMinus').addEventListener('click', () => setQuantity(Number(quantity.value) - 1));
+    document.getElementById('catalogModalPlus').addEventListener('click', () => setQuantity(Number(quantity.value) + 1));
+    quantity.addEventListener('input', () => setQuantity(quantity.value));
+    backdrop.addEventListener('click', event => { if (event.target === backdrop) closeModal(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !backdrop.hidden) closeModal(); });
+})();
+</script>
+
+

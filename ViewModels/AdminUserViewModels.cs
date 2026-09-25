@@ -49,7 +49,7 @@ namespace WholesaleHub.ViewModels
         public string? Password { get; set; }
 
         [Required]
-        [RegularExpression("^(Accountant|Warehouse|Customer)$", ErrorMessage = "Select Accountant, Warehouse, or Customer.")]
+        [RegularExpression("^(Admin|Accountant|Warehouse|Customer)$", ErrorMessage = "Select Admin, Accountant, Warehouse, or Customer.")]
         public string Role { get; set; } = "Customer";
 
         [StringLength(50)]
